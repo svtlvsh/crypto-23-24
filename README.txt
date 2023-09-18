@@ -1,6 +1,9 @@
 FORKED REPOS LINK === forked-rep
 
 To add new files:
+0)Add remote (do it only once when doing commit first time):
+git remote add forked-rep https://github.com/CringeCodingIsObligatory/crypto-23-24-forked
+
 1)Select branch
 "git checkout BRANCH_NAME"
 
