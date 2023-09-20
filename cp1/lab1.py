@@ -1,7 +1,6 @@
 import re
 import math
 
-
 def filter():
     with open("1.txt", 'r', encoding='utf-8') as file:
         text = file.read()
@@ -35,20 +34,18 @@ def chastota():
         if item in dictionary:
             dictionary[item] += 1
 
+    print(dictionary)
+
     for i in alphabet:
         dictionary[i] = dictionary[i] / len(list(text))
 
-    def print_result():
-        for key, number in dictionary.items():
-            number = round(number, 5)
-            print(f"Ключ: {key}, Значення: {number}")
-
-    #print_result()
+    print(dictionary)
 
     suma = 0
     for i in alphabet:
         suma += (-1)*(dictionary[i] * math.log2(dictionary[i]))
-    #print(suma)
+
+    print(suma)
 
 chastota()
 
@@ -58,7 +55,6 @@ def chastota_bigram():
 
     dictionary = {}
     array = []
-
 
     for i in range(0, len(text), 2):
         bigram = text[i:i + 2]
@@ -80,12 +76,21 @@ def chastota_bigram():
 
     print(dictionary)
 
-    for i in list(dictionary.keys()):
-        dictionary[i] = dictionary[i] / len(array)
+    # Cортування біграм в спадному орядку
+    sorted_dictionary = sorted(dictionary.items(), key=lambda x: x[1], reverse=True)
+    sorted_dictionary = dict(sorted_dictionary)
+
+    print(sorted_dictionary)
+
+    for i in list(sorted_dictionary.keys()):
+        sorted_dictionary[i] = sorted_dictionary[i] / len(array)
+        #sorted_dictionary[i] = round(sorted_dictionary[i], 5)
+
+    print(sorted_dictionary)
 
     suma = 0
-    for i in list(dictionary.keys()):
-        suma += (-1) * (dictionary[i] * math.log2(dictionary[i])) / 2
+    for i in list(sorted_dictionary.keys()):
+        suma += (-1) * (sorted_dictionary[i] * math.log2(sorted_dictionary[i])) / 2
     print(suma)
 
 chastota_bigram()
