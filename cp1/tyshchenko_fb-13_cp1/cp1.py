@@ -83,20 +83,6 @@ def print_matrix(frequencies: dict) -> None:
 def entropy(probabilities: dict) -> float:
     entropy = -sum(p * log(p, 2) for p in probabilities.values())
     return entropy
-    
-# EXTRA
-def conditional_probability(n: int, text: str) -> dict:
-    # n = m + 1
-    ngrams = ngram_processing(text, n)
-    mgrams = ngram_processing(text, n - 1)
-    possibilities = dict.fromkeys(ngrams, 0)
-    for ngr in ngrams:
-        for mgr in mgrams:
-            if ngr[:len(mgr)] == mgr:
-                possibilities[ngr] += 1
-    total = sum(possibilities.values())
-    cond_probs = {ngr : count / total for ngr, count in possibilities.items()}
-    return cond_probs
 
 
 if __name__ == "__main__":
@@ -116,19 +102,6 @@ if __name__ == "__main__":
         else:
             print(f"Frequencies are:\n{freqs}")
         print(f"Entropy is:\n{entr}")
-
-        '''
-        EXTRA: Conditional entropy calculation
-        cp_10 = conditional_probability(10, text)
-        print(f"H^(10) = {cp_10}")
-        cp_20 = conditional_probability(20, text)
-        print(f"H^(20) = {cp_20}")
-        cp_30 = conditional_probability(30, text)
-        print(f"H^(30) = {cp_30}")
-        print(f"H_cond(cp_10) = \n{entropy(cp_10)}")
-        print(f"H_cond(cp_20) = \n{entropy(cp_20)}")
-        print(f"H_cond(cp_30) = \n{entropy(cp_30)}")
-        '''
     else:
         print(
             """USAGE: ./cp1.py FILENAME ALLOW_SPACES N 
