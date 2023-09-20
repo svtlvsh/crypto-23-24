@@ -81,7 +81,7 @@ def print_matrix(frequencies: dict) -> None:
 
 # It is used for calculating both simple and conditional entropy
 def entropy(probabilities: dict) -> float:
-    entropy = -sum(p * log(p, 2) for p in probabilities.values())
+    entropy = -sum(p * log(p, 2) for p in probabilities.values() if p > 0)
     return entropy
 
 
