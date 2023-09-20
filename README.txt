@@ -15,3 +15,6 @@ git commit -m "COMMENTS TO COMMIT"
 
 4)Push changes of commit to github
 git push -u forked-rep BRANCH_NAME
+
+5)If you can't push changes - probably you need to pull the repos
+git pull
