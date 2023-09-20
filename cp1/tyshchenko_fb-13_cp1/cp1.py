@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from math import log
+import sys
 
 ALPHABET_LEN = 32
 ROUND_FLOAT = 3
@@ -47,26 +48,13 @@ def ngram_processing(text: str, n: int, count=False):
     return ngrams
 
 # frequency = probability (ngram count -> infinity)
-def probability(n: int, text: str) -> dict:
+def probability(n: int, text: str, round_by=ROUND_FLOAT) -> dict:
     ngrams = ngram_processing(text, n, count=True)
     total = sum(ngrams.values())
-    probabilities = {ngr : count / total for ngr, count in ngrams.items()}
-    return probabilities
+    probs = {ngr : round(count/total, round_by) for ngr, count in ngrams.items()}
+    return probs
     
-def conditional_probability(n: int, text: str) -> dict:
-    # n = m + 1
-    ngrams = ngram_processing(text, n)
-    mgrams = ngram_processing(text, n - 1)
-    possibilities = dict.fromkeys(ngrams, 0)
-    for ngr in ngrams:
-        for mgr in mgrams:
-            if ngr[:len(mgr)] == mgr:
-                possibilities[ngr] += 1
-    total = sum(possibilities.values())
-    cond_probabilities = {ngr : count / total for ngr, count in possibilities.items()}
-    return cond_probabilities
-    
-def print_bigram_frequency(frequencies: dict) -> None:
+def print_matrix(frequencies: dict) -> None:
     # check if frequencies correspond to bigrams
     if len(list(frequencies.keys())[0]) != 2:
         print("Failed to show frequencies of ngrams: n != 2")
@@ -95,45 +83,55 @@ def print_bigram_frequency(frequencies: dict) -> None:
 def entropy(probabilities: dict) -> float:
     entropy = -sum(p * log(p, 2) for p in probabilities.values())
     return entropy
+    
+# EXTRA
+def conditional_probability(n: int, text: str) -> dict:
+    # n = m + 1
+    ngrams = ngram_processing(text, n)
+    mgrams = ngram_processing(text, n - 1)
+    possibilities = dict.fromkeys(ngrams, 0)
+    for ngr in ngrams:
+        for mgr in mgrams:
+            if ngr[:len(mgr)] == mgr:
+                possibilities[ngr] += 1
+    total = sum(possibilities.values())
+    cond_probs = {ngr : count / total for ngr, count in possibilities.items()}
+    return cond_probs
 
-# Testing functions
-#print(ngram_processing("abcde", 2))
-text = read_file("small.txt")
-text = format_text(text)
 
-cp_10 = conditional_probability(10, text)
-#print(f"H^(10) = {cp_10}")
-cp_20 = conditional_probability(20, text)
-#print(f"H^(20) = {cp_20}")
-cp_30 = conditional_probability(30, text)
-#print(f"H^(30) = {cp_30}")
-print(f"H_cond(cp_10) = \n{entropy(cp_10)}")
-print(f"H_cond(cp_20) = \n{entropy(cp_20)}")
-print(f"H_cond(cp_30) = \n{entropy(cp_30)}")
-'''
-text_spaceless = read_file("temp.txt")
-text_spaceless = format_text(text_spaceless, allow_spaces=False)
-letter_count = ngram_processing(text, 1, count=True)
-letter_count_spaceless = ngram_processing(text_spaceless, 1, count=True)
-bigram_count = ngram_processing(text, 2, count=True)
-bigram_count_spaceless = ngram_processing(text_spaceless, 2, count=True)
-letter_freqs = probability(1, text)
-#print(f"Letter probability is:\n{letter_freqs}")
-letter_freqs_spaceless = probability(1, text_spaceless)
-bigram_freqs = probability(2, text)
-bigram_freqs_spaceless = probability(2, text_spaceless)
-#print(f"Bigram probability is:\n{bigram_freqs}")
-letter_entr = entropy(letter_freqs)
-letter_entr_spaceless = entropy(letter_freqs_spaceless)
-bigram_entr = entropy(bigram_freqs)
-bigram_entr_spaceless = entropy(bigram_freqs_spaceless)
-#print(f"Text is:\n{text}")
-#print(f"Letter count is:\n{letter_count}")
-#print(f"Bigram count is:\n{bigram_count}")
-print(f"Letter entropy is:\n{letter_entr}")
-print(f"Bigram entropy is:\n{bigram_entr}")
-print(f"Letter entropy without spaces is:\n{letter_entr_spaceless}")
-print(f"Bigram entropy without spaces is:\n{bigram_entr_spaceless}")
-#print("Bigram frequency (probability) matrix:")
-#print_bigram_probability(bigram_freqs)
-'''
+if __name__ == "__main__":
+    if len(sys.argv) == 4:
+        f, n = sys.argv[1], int(sys.argv[3])
+        s = True if sys.argv[2] == 'y' else False
+        
+        text = format_text(read_file(f), s)
+        count = ngram_processing(text, n, count=True)
+        freqs = probability(n, text, round_by=ROUND_FLOAT)
+        entr = entropy(freqs)
+
+        print(f"Count is:\n{count}")
+        if n == 2:
+            print("Bigram frequency (probability) matrix:")
+            print_matrix(freqs)
+        else:
+            print(f"Frequencies are:\n{freqs}")
+        print(f"Entropy is:\n{entr}")
+
+        '''
+        EXTRA: Conditional entropy calculation
+        cp_10 = conditional_probability(10, text)
+        print(f"H^(10) = {cp_10}")
+        cp_20 = conditional_probability(20, text)
+        print(f"H^(20) = {cp_20}")
+        cp_30 = conditional_probability(30, text)
+        print(f"H^(30) = {cp_30}")
+        print(f"H_cond(cp_10) = \n{entropy(cp_10)}")
+        print(f"H_cond(cp_20) = \n{entropy(cp_20)}")
+        print(f"H_cond(cp_30) = \n{entropy(cp_30)}")
+        '''
+    else:
+        print(
+            """USAGE: ./cp1.py FILENAME ALLOW_SPACES N 
+            [*] FILENAME\t- path to the text file
+            [*] ALLOW_SPACES - leave spaces in text(y or n)
+            [*] N\t\t- n-gram length (N >= 1)""")
