@@ -4,6 +4,7 @@ from math import log
 import sys
 
 ALPHABET_LEN = 32
+COLUMN_NUM = 4
 ROUND_FLOAT = 3
 
 def read_file(fname: str) -> str:
@@ -54,15 +55,13 @@ def probability(n: int, text: str, round_by=ROUND_FLOAT) -> dict:
     probs = {ngr : round(count/total, round_by) for ngr, count in ngrams.items()}
     return probs
     
-def print_matrix(frequencies: dict) -> None:
-    # check if frequencies correspond to bigrams
-    if len(list(frequencies.keys())[0]) != 2:
-        print("Failed to show frequencies of ngrams: n != 2")
-    else:
+def print_dict(dictionary: dict) -> None:
+    # case print matrix
+    if len(list(dictionary.keys())[0]) == 2:
         # second letter (without duplicates)
-        second_letter = list(set([x[1] for x in frequencies]))
+        second_letter = list(set([x[1] for x in dictionary]))
         # first letter (without duplicates)
-        first_letter = list(set([x[0] for x in frequencies]))
+        first_letter = list(set([x[0] for x in dictionary]))
         # put in ablphabetical order
         first_letter.sort()
         second_letter.sort()
@@ -71,15 +70,23 @@ def print_matrix(frequencies: dict) -> None:
             row = [0] * len(second_letter)
             for j in range(len(second_letter)):
                 ngr = f"{first_letter[i]}{second_letter[j]}"
-                if ngr in frequencies:
-                    row[j] = round(frequencies[ngr], ROUND_FLOAT)
+                if ngr in dictionary:
+                    row[j] = round(dictionary[ngr], ROUND_FLOAT)
             data.append(row)
         format_row = "{:>8}" * (len(second_letter) + 1)
         print(format_row.format("", *second_letter))
         for letter, value in zip(first_letter, data):
             print(format_row.format(letter, *value))
+    # case print in columns
+    else:
+        freqs = list(dictionary.items())
+        freqs.sort()
+        num = len(freqs)
+        for i in range(num):
+            print(f'\t"{freqs[i][0]}" - {freqs[i][1]}\t', end='')
+            if (i + 1) % COLUMN_NUM == 0 or i + 1 == num:
+                print("")
 
-# It is used for calculating both simple and conditional entropy
 def entropy(probabilities: dict) -> float:
     entropy = -sum(p * log(p, 2) for p in probabilities.values() if p > 0)
     return entropy
@@ -95,13 +102,11 @@ if __name__ == "__main__":
         freqs = probability(n, text, round_by=ROUND_FLOAT)
         entr = entropy(freqs)
 
-        print(f"Count is:\n{count}")
-        if n == 2:
-            print("Bigram frequency (probability) matrix:")
-            print_matrix(freqs)
-        else:
-            print(f"Frequencies are:\n{freqs}")
-        print(f"Entropy is:\n{entr}")
+        print(f"Count is:")
+        print_dict(count)
+        print("Frequencies (probabilities) are:")
+        print_dict(freqs)
+        print(f"Entropy (n = {n}, with{'' if s else 'out'} spaces) is:\n{entr}")
     else:
         print(
             """USAGE: ./cp1.py FILENAME ALLOW_SPACES N 
