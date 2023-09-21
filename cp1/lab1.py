@@ -61,12 +61,13 @@ def chastota_bigram():
         if len(bigram) == 2:
             array.append(bigram)
 
-    for i in range(1, len(text), 2):
-        bigram = text[i:i + 2]
-        if len(bigram) == 2:
-            array.append(bigram)
+    def add_povtoru():
+        for i in range(1, len(text), 2):
+            bigram = text[i:i + 2]
+            if len(bigram) == 2:
+                array.append(bigram)
 
-    #print(array)
+    add_povtoru()
 
     for i in array:
         if i in dictionary:
@@ -90,7 +91,7 @@ def chastota_bigram():
 
     suma = 0
     for i in list(sorted_dictionary.keys()):
-        suma += (-1) * (sorted_dictionary[i] * math.log2(sorted_dictionary[i])) / 2
+        suma += (-1) * (sorted_dictionary[i] * math.log2(sorted_dictionary[i]))/2
     print(suma)
 
 chastota_bigram()
