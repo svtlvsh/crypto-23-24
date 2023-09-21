@@ -66,7 +66,7 @@ print("-----Кінець Текста із пробілами-----")
 print("-" * 300)
 
 print("-----Текст без пробілів-----")
-with open('Text1.txt', 'r', encoding = 'cp1251') as file:
+with open('Text.txt', 'r', encoding = 'cp1251') as file:
     # Read the entire file content into a string
     file_contents = file.read()
     file_contents = file_contents.lower()
