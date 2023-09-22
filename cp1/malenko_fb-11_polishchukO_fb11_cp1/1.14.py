@@ -26,8 +26,7 @@ class Lab1Text:
             else:
                 frequencies[ngram] = 1
         normalized_frequencies = {ngram: frequency/ngrams_count for ngram, frequency in frequencies.items()}
-        print(dict(sorted(normalized_frequencies.items(), key=lambda item: item[1], reverse=True)[:10]))
-        # print(sum(normalized_frequencies.values()))
+        print(sum(normalized_frequencies.values()))
         return normalized_frequencies
 
     def get_entropy(self, length, distance=1):
