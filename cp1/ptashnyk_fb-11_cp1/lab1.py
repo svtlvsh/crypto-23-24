@@ -103,7 +103,7 @@ def CountBigrams(text,spaces = False,crossing = False):
         csvwriter.writerow(["Redundancy",redundancy])
 
 if __name__ == "__main__":
-    text = ReadFile("sample.txt")
+    text = ReadFile("Prestuplenie-i-nakazanie.txt")
     text = ClearText(text)
     CountLetters(text)
     CountLetters(text ,True)
