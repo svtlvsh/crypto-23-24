@@ -11,13 +11,13 @@ getcontext().prec = 100
 
 def clearText(text:str) -> str:
     text_ = list(text)
-    permitted = RUS_ALPHABET + RUS_ALPHABET.upper()
+    permitted = RUS_ALPHABET
     result = [char for char in text_ if char in permitted]
     return ''.join(result)
 
 def parseText(text:str) -> str:
     text_ = list(text)
-    permitted = RUS_ALPHABET + RUS_ALPHABET.upper() + string.punctuation + string.digits + ' '
+    permitted = RUS_ALPHABET + string.punctuation + string.digits + ' '
     result = [char for char in text_ if char in permitted]
     return ''.join(result)
 
@@ -45,7 +45,7 @@ def getEntropy(freq:dict) -> float:
 
 def main() -> None:
     with open(TEXT_FILENAME) as f:
-        text_rus_clear = f.read().replace("\n"," ")
+        text_rus_clear = f.read().replace("\n"," ").lower()
     
     print(f"{a_} Counting the frequency for characters one by one...")
     freq_single = freqCalc(parseText(text_rus_clear))
