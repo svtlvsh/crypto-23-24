@@ -1,20 +1,20 @@
 #!/usr/bin/python3
 
+from collections import Counter
 from math import log
 import sys
 
-ALPHABET_LEN = 32
 COLUMN_NUM = 4
 ROUND_FLOAT = 3
+ALPHABET = "абвгдежзийклмнопрстуфхцчшщыьэюя "
+M = len(ALPHABET)
 
 def read_file(fname: str) -> str:
     with open(fname, "r") as f:
         text = f.read()
-        f.close()
     return text
     
 def format_text(text: str, allow_spaces=True) -> str:
-    allowed = "абвгдежзийклмнопрстуфхцчшщыьэюя "
     # remove uppercase letters
     text = text.lower()
     # replace some letters
@@ -22,7 +22,7 @@ def format_text(text: str, allow_spaces=True) -> str:
     text = text.replace("ъ", "ь")
     # remove other symbols
     for i in range(len(text)):
-        if text[i] not in allowed:
+        if text[i] not in ALPHABET:
             text = text.replace(text[i], " ")
     # remove extra whitespaces or all of them
     temp = text.split()
@@ -32,25 +32,18 @@ def format_text(text: str, allow_spaces=True) -> str:
         text = "".join(temp)
     return text
 
-def ngram_processing(text: str, n: int, count=False):
+def ngram_processing(text: str, n: int, count=True, step=1):
     text_len = len(text)
+    ngrams = [text[s:s + n] for s in range(0, text_len - n + 1, step)]
+    ngram_count = Counter(ngrams)
     if count:
-        ngrams = {}
-        for s in range(text_len - n + 1):
-            ngr = text[s:s + n]
-            if ngr not in ngrams:
-                ngrams[ngr] = text.count(ngr)
+        return ngram_count
     else:
-        ngrams = []
-        for s in range(text_len - n + 1):
-            ngr = text[s:s + n]
-            if ngr not in ngrams:
-                ngrams.append(ngr)
-    return ngrams
+        return ngrams
 
 # frequency = probability (ngram count -> infinity)
-def probability(n: int, text: str, round_by=ROUND_FLOAT) -> dict:
-    ngrams = ngram_processing(text, n, count=True)
+def probability(n: int, text: str, round_by=ROUND_FLOAT, step=1) -> dict:
+    ngrams = ngram_processing(text, n, count=True, step=step)
     total = sum(ngrams.values())
     probs = {ngr : round(count/total, round_by) for ngr, count in ngrams.items()}
     return probs
@@ -79,37 +72,82 @@ def print_dict(dictionary: dict) -> None:
             print(format_row.format(letter, *value))
     # case print in columns
     else:
-        freqs = list(dictionary.items())
-        freqs.sort()
-        num = len(freqs)
-        for i in range(num):
-            print(f'\t"{freqs[i][0]}" - {freqs[i][1]}\t', end='')
-            if (i + 1) % COLUMN_NUM == 0 or i + 1 == num:
+        freqs = dict(sorted(dictionary.items(), reverse=True, key=lambda item: item[1]))
+        size = len(freqs)
+        counter = 0
+        for i in freqs:
+            print(f'\t"{i}" - {freqs[i]}\t', end='')
+            if (counter + 1) % COLUMN_NUM == 0 or counter + 1 == size:
                 print("")
+            counter += 1
 
 def entropy(probabilities: dict) -> float:
-    entropy = -sum(p * log(p, 2) for p in probabilities.values() if p > 0)
-    return entropy
+    return -sum(p * log(p, 2) for p in probabilities.values() if p > 0)
+    
+def entropy_n(entr: float, n: int) -> float:
+    return entr / n
+    
+def redundancy(entr_n: float, m: int) -> float:
+    return 1 - entr_n / log(m, 2)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 4:
-        f, n = sys.argv[1], int(sys.argv[3])
-        s = True if sys.argv[2] == 'y' else False
+    if len(sys.argv) == 2:
+        f = sys.argv[1]
         
-        text = format_text(read_file(f), s)
-        count = ngram_processing(text, n, count=True)
-        freqs = probability(n, text, round_by=ROUND_FLOAT)
-        entr = entropy(freqs)
+        # "1" - for letters, "2" - for bigrams
+        # "sp" - with spaces, "st" - with step
+        text_sp = format_text(read_file(f), allow_spaces=True)
+        text = format_text(text_sp, allow_spaces=False)
+        
+        freqs1_sp = probability(1, text_sp, round_by=ROUND_FLOAT)
+        freqs1 = probability(1, text, round_by=ROUND_FLOAT)
+        freqs2_sp = probability(2, text_sp, round_by=ROUND_FLOAT)
+        freqs2 = probability(2, text, round_by=ROUND_FLOAT)
+        freqs2_sp_st = probability(2, text_sp, round_by=ROUND_FLOAT, step=2)
+        freqs2_st = probability(2, text, round_by=ROUND_FLOAT, step=2)
+        
+        entr1_sp = entropy(freqs1_sp)
+        entr1 = entropy(freqs1)
+        entr2_sp = entropy_n(entropy(freqs2_sp), 2)
+        entr2 = entropy_n(entropy(freqs2), 2)
+        entr2_sp_st = entropy_n(entropy(freqs2_sp_st), 2)
+        entr2_st = entropy_n(entropy(freqs2_st), 2)
+        
+        red1_sp = redundancy(entr1_sp, M)
+        red1 = redundancy(entr1, M-1)
+        red2_sp = redundancy(entr2_sp, M)
+        red2 = redundancy(entr2, M-1)
+        red2_sp_st = redundancy(entr2_sp_st, M)
+        red2_st = redundancy(entr2_st, M-1)
 
-        print(f"Count is:")
-        print_dict(count)
-        print("Frequencies (probabilities) are:")
-        print_dict(freqs)
-        print(f"Entropy (n = {n}, with{'' if s else 'out'} spaces) is:\n{entr}")
+        print("\nFrequencies (n = 1, with spaces) are:")
+        print_dict(freqs1_sp)
+        print("\nFrequencies (n = 1, without spaces) are:")
+        print_dict(freqs1)
+        print("\nFrequencies (n = 2, with spaces) are:")
+        print_dict(freqs2_sp)
+        print("\nFrequencies (n = 2, without spaces) are:")
+        print_dict(freqs2)
+        print("\nFrequencies (n = 2, with spaces, read with step) are:")
+        print_dict(freqs2_sp_st)
+        print("\nFrequencies (n = 2, without spaces, read with step) are:")
+        print_dict(freqs2_st)
+        
+        print(f"\nEntropy_n (n = 1, with spaces) is:\n\t{entr1_sp}")
+        print(f"\nEntropy_n (n = 1, without spaces) is:\n\t{entr1}")
+        print(f"\nEntropy_n (n = 2, with spaces) is:\n\t{entr2_sp}")
+        print(f"\nEntropy_n (n = 2, without spaces) is:\n\t{entr2}")
+        print(f"\nEntropy_n (n = 2, with spaces, with step) is:\n\t{entr2_sp_st}")
+        print(f"\nEntropy_n (n = 2, without spaces, with step) is:\n\t{entr2_st}")
+        
+        print(f"\nRedundancy (n = 1, with spaces) is:\n\t{red1_sp}")
+        print(f"\nRedundancy (n = 1, without spaces) is:\n\t{red1}")
+        print(f"\nRedundancy (n = 2, with spaces) is:\n\t{red2_sp}")
+        print(f"\nRedundancy (n = 2, without spaces) is:\n\t{red2}")
+        print(f"\nRedundancy (n = 2, with spaces, with step) is:\n\t{red2_sp_st}")
+        print(f"\nRedundancy (n = 2, without spaces, with step) is:\n\t{red2_st}")
     else:
         print(
-            """USAGE: ./cp1.py FILENAME ALLOW_SPACES N 
-            [*] FILENAME\t- path to the text file
-            [*] ALLOW_SPACES - leave spaces in text(y or n)
-            [*] N\t\t- n-gram length (N >= 1)""")
+            """USAGE: ./cp1.py INPUTFILE
+            [*] INPUTFILE\t- path to the input file""")
