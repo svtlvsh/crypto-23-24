@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from pprint import pp 
 import string
-import math
+from math import log2
 from decimal import *
 
 e_,a_,q_ = "[!]","[*]","[?]"
@@ -17,7 +17,7 @@ def clearText(text:str) -> str:
 
 def parseText(text:str) -> str:
     text_ = list(text)
-    permitted = RUS_ALPHABET + string.punctuation + string.digits + ' '
+    permitted = RUS_ALPHABET + ' ' #+ string.punctuation + string.digits 
     result = [char for char in text_ if char in permitted]
     return ''.join(result)
 
@@ -51,10 +51,16 @@ def freqCalc(text:str,ch_len:int=1,step:int=1) -> dict:
     for item in frequencies: frequencies[item] = Decimal.from_float(frequencies[item] / sm_elems)
     return frequencies
 
-def getEntropy(freq:dict) -> float:
+def getEntropy(freq:dict) -> Decimal:
     entropy = Decimal(0.0)
-    for f in freq.values(): entropy -= f * Decimal.from_float(math.log2(f))
-    return entropy
+    for f in freq.values(): entropy -= f * Decimal.from_float(log2(f))
+    return entropy / len(list(freq.keys())[0])
+
+def getRedundancy(h:Decimal,alphabet:list=RUS_ALPHABET) -> Decimal:
+    h0 = Decimal(log2(len(alphabet)))
+    r = Decimal(1 - (h / h0))
+    return r
+
 
 
 def main() -> None:
@@ -67,14 +73,18 @@ def main() -> None:
     printFreq(freq_single)
     entr1 = getEntropy(freq_single)
     print(f"{e_} Entropy H1: {entr1}")
+    print(f"{e_} Redundancy R1: {getRedundancy(entr1,RUS_ALPHABET+' ')}")
     print(f"|\n{a_} Same text without spaces and special chars...")
     freq_single_WoSpaces = freqCalc(clearText(text_rus_clear))
     printFreq(freq_single_WoSpaces)
     entr1_ = getEntropy(freq_single_WoSpaces)
-    print(f"{e_} H1 wo spaces: {entr1_}")
+    print(f"{e_} H1 w/o spaces: {entr1_}")
+    print(f"{e_} R1 w/o spaces: {getRedundancy(entr1_)}")
 
 
     
+    #bigram_alphabet = [i+j for i in RUS_ALPHABET for j in RUS_ALPHABET]
+    #works fine if we skip division by 2 for H2 entropy, and work with bigram alphabet without RUS_ALPHABET when defining R2
 
     print(f"|\n{a_} Counting frequency for bigrams with overlay...")
     freq_bigram = freqCalc(parseText(text_rus_clear),2)
@@ -82,17 +92,24 @@ def main() -> None:
     if input("> Show bigram frequencies table? [y/n] ").lower() == "y": printFreq(freq_bigram)
     entr2 = getEntropy(freq_bigram)
     print(f"{e_} Entropy H2: {entr2}")
+    print(f"{e_} Redundancy R2: {getRedundancy(entr2, RUS_ALPHABET+' ')}")
     freq_wOL = freqCalc(parseText(text_rus_clear),2,2)
-    print(f"{e_} Entropy H2` for text without overlapping: {getEntropy(freq_wOL)}")
+    entr2_wOL = getEntropy(freq_wOL)
+    print(f"{e_} Entropy H2` for text without overlapping: {entr2_wOL}")
+    print(f"{e_} Redundancy H2` for text without overlapping: {getRedundancy(entr2_wOL, RUS_ALPHABET+' ')}")
 
     print(f"|\n{a_} Counting frequency for bigrams without spaces...")
     freq_bigram_WoSpaces = freqCalc(clearText(text_rus_clear),2)
     print(f"{e_} Frequency for bigrams:")
     if input("> Show bigram frequencies table? [y/n] ").lower() == "y": printFreq(freq_bigram_WoSpaces)
     entr2_ = getEntropy(freq_bigram_WoSpaces)
-    print(f"{e_} H2 wo spaces: {entr2_}")
+    print(f"{e_} H2 w/o spaces: {entr2_}")
+    print(f"{e_} R2 w/o spaces: {getRedundancy(entr2_)}")
     freq_wOL_WoSpaces = freqCalc(clearText(text_rus_clear),2,2)
-    print(f"{e_} H2` wo spaces, wo overpalling: {getEntropy(freq_wOL_WoSpaces)}")
+    entr2_wOL_WoSpaces = getEntropy(freq_wOL_WoSpaces)
+    print(f"{e_} H2` w/o spaces, w/o overpalling: {entr2_wOL_WoSpaces}")
+    print(f"{e_} R2` w/o spaces, w/o overlapping: {getRedundancy(entr2_wOL_WoSpaces)}")
+
 
     if input("> Show bigram frequencies matrix? [y/n] ").lower() == "y": printMatrix(freq_bigram_WoSpaces)
     
