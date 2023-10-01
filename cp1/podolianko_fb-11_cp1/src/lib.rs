@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-pub const VALID_LETTERS: &str = "абвгдеёжзийклмнопрстуфхцчшщьыъэюя";
+pub const VALID_LETTERS: &str = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
 
 /// Calculate entropy on `probabilities` (log2)
 pub fn entropy_from_probabilities<'a, I: Iterator<Item=&'a f64>>(probabilities: I) -> f64 {
@@ -51,6 +51,7 @@ pub fn ngram_frequencies
 {
     // A vector will suit us well for working with ngrams
     let char_vec: Vec<char> = text.chars().collect();
+    assert_ne!(text.len(), 0);
     let mut count_map: HashMap<String, usize> = HashMap::with_capacity(char_vec.len() + 1 - n);
 
     for i in (0..char_vec.len() + 1 - n).step_by(if overlap { 1 } else { n }) {
@@ -69,7 +70,31 @@ pub fn ngram_frequencies
     Ok(frequency_map)
 }
 
-pub fn print_freq_table(freq_map: &HashMap<String, f64>) {
+/// Print a sorted table of ngrams and corresponding frequencies.
+/// * `max_columns` - specifies maximum number of columns, the table may actually consist of less columns than specified by this argument.
+/// * `float_precision` - specifies floating-point precision of frequencies
+pub fn print_freq_plain(freq_map: &HashMap<String, f64>, max_columns: usize, float_precision: usize) {
+    let columns = max_columns;
+
+    let mut ngrams: Vec<&String> = freq_map.keys().collect();
+    ngrams.sort();
+
+    let rows = (ngrams.len() / columns) + if ngrams.len() % columns == 0 { 0 } else { 1 };
+
+    for row in 0..rows {
+        for col in 0..columns {
+            let index = col * rows + row;
+            if index >= ngrams.len() {
+                break;
+            }
+            let ngram = ngrams[index];
+            print!("| {}:{:^.fp$} ", ngram, freq_map.get(ngram).unwrap_or(&0f64), fp = float_precision);
+        }
+        println!("|");
+    }
+}
+
+pub fn print_bigram_freq_table(freq_map: &HashMap<String, f64>) {
     let first_char_set: HashSet<char> = freq_map.keys().into_iter().map(|c| { c.chars().next().expect("must've had one char at least") }).collect();
     let second_char_set: HashSet<char> = freq_map.keys().into_iter().map(|c| { c.chars().skip(1).next().expect("must've had two chars at least") }).collect();
     let mut first_chars_sorted: Vec<char> = first_char_set.into_iter().collect();
@@ -79,8 +104,8 @@ pub fn print_freq_table(freq_map: &HashMap<String, f64>) {
     let (table_x, table_y) = (second_chars_sorted.len(), first_chars_sorted.len());
 
 
-    let float_precision = 4;
-    let cell_width = float_precision + 2;
+    let cell_width = 7;
+    let float_precision = cell_width - 2;
 
     // print header
     print!("|{:cell_width$}", " ");
@@ -91,7 +116,7 @@ pub fn print_freq_table(freq_map: &HashMap<String, f64>) {
 
     // print separator
     print!("|{:-<cell_width$}", "-");
-    for x in 0..table_x {
+    for _x in 0..table_x {
         print!("+{:-<cell_width$}", "");
     }
     println!("|");
@@ -101,7 +126,8 @@ pub fn print_freq_table(freq_map: &HashMap<String, f64>) {
         print!("|{:^cell_width$}", first_chars_sorted[y]);
         for x in 0..table_x {
             let key: String = [first_chars_sorted[y], second_chars_sorted[x]].iter().collect();
-            print!("|{:^.float_precision$}", freq_map.get(&key).unwrap_or(&0f64));
+            let f = freq_map.get(&key).unwrap_or(&0f64);
+            print!("|{:^wp$.fp$}", f, wp = cell_width, fp = if *f == 0f64 { 0 } else { float_precision });
         }
         println!("|");
     }
@@ -121,5 +147,20 @@ mod tests {
     fn str_normalization_preserve_test() {
         let text = "Какой-то \r\n текст";
         assert_eq!(normalize_string(&text, VALID_LETTERS, true), "какой то текст")
+    }
+
+    #[test]
+    #[ignore]
+    fn print_freq_plain_test() {
+        let sample = HashMap::from([
+            (String::from("а"), 0.125f64), (String::from("б"), 0.125f64),
+            (String::from("в"), 0.125f64), (String::from("г"), 0.125f64),
+            (String::from("д"), 0.125f64), (String::from("е"), 0.125f64),
+            (String::from("ё"), 0.125f64), (String::from("ж"), 0.125f64)
+        ]);
+        for i in 1..8 {
+            println!("Columns: {i}");
+            print_freq_plain(&sample, i, 5);
+        }
     }
 }
