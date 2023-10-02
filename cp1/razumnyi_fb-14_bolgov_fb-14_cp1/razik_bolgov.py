@@ -107,7 +107,7 @@ def bigram_frequency(text_to_freq, cross=True, spaces=True):
         bigram_freq_dict[i] = mass.count(i)
 
     for i in bigram_freq_dict:
-        bigram_freq_dict[i] = round(bigram_freq_dict[i] / len(mass), 10) # remove 10 round
+        bigram_freq_dict[i] = round(bigram_freq_dict[i] / len(mass), 10)
 
     if not spaces:
         alphabet = list(allowed_letters[:-1])
