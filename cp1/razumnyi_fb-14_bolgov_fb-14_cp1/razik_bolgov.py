@@ -185,4 +185,3 @@ if __name__ == '__main__':
     # Find non-crossed bigram frequencies in text without spaces
     bigram_frequency(f2_read, spaces=False, cross=False)
 
-
