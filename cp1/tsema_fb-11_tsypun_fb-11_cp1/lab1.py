@@ -35,13 +35,15 @@ def text_purification(fLine: str, isnlp=False, save_space=False) -> [bool, str]:
                 output += s
             continue
 
-        if s == "\n" and not isNewLineCPresent:
+        if s == '\n' and not isNewLineCPresent:
             isNewLineCPresent = True
-            if save_space:
+
+            if save_space and not isSpacePresent:
                 output += " "
+                isSpacePresent = True
             continue
 
-        if s in ["ъ", "ё"]:
+        if s in substitutions.keys():
             output += substitutions[s]
 
             isSpacePresent = False
@@ -65,20 +67,20 @@ def fLine_gen(fPath: str) -> str:
 
 
 if __name__ == "__main__":
-    # with open("purified_text_w_s.txt", "w", encoding="utf8") as hFile:
-    #     isnlp = False
-    #     for fLine in fLine_gen("lab_text.txt"):
-    #         isnlp, pur_line = text_purification(fLine, isnlp, True)
-    #         hFile.writelines(pur_line)
-    #         print(pur_line)
+    with open("purified_text_w_s.txt", "w", encoding="utf8") as hFile:
+        isnlp = False
+        for fLine in fLine_gen("lab_text.txt"):
+            isnlp, pur_line = text_purification(fLine, isnlp, True)
+            hFile.writelines(pur_line)
+            print(pur_line)
 
-    # with open("purified_text_w_null.txt", "w", encoding="utf8") as hFile:
-    #     isnlp = False
-    #     for fLine in fLine_gen("lab_text.txt"):
-    #         isnlp, pur_line = text_purification(fLine, isnlp)
-    #         hFile.writelines(pur_line)
-    #         print(pur_line)
-    
+    with open("purified_text_w_null.txt", "w", encoding="utf8") as hFile:
+        isnlp = False
+        for fLine in fLine_gen("lab_text.txt"):
+            isnlp, pur_line = text_purification(fLine, isnlp)
+            hFile.writelines(pur_line)
+            print(pur_line)
+
     bigr_wo_int_dict = {}
     bigr_w_int_dict = {}
     onegr_wo_int_dict = {}
