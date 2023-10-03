@@ -1,5 +1,4 @@
-import math
-
+from math import log2
 
 alpha = "абвгдежзийклмнопрстуфхцчшщыьэюя"
 
@@ -15,6 +14,8 @@ def freq_count(fLine: str, n: int, ngr_dict: dict, ngr_intercept=False) -> None:
             ngr_dict.update({fLine[i: i + n]: 1})
         else:
             ngr_dict[fLine[i: i + n]] += 1
+
+    ngr_dict = {i: ngr_dict[i] for i in sorted(ngr_dict.keys())}
 
 
 def text_purification(fLine: str, isnlp=False, save_space=False) -> (bool, str):
@@ -33,7 +34,6 @@ def text_purification(fLine: str, isnlp=False, save_space=False) -> (bool, str):
 
         if s == '\n' and not isNewLineCPresent:
             isNewLineCPresent = True
-
             if save_space and not isSpacePresent:
                 output += " "
                 isSpacePresent = True
@@ -42,21 +42,23 @@ def text_purification(fLine: str, isnlp=False, save_space=False) -> (bool, str):
         if s in substitutions.keys():
             output += substitutions[s]
 
-            isSpacePresent = False
-            isNewLineCPresent = False
-            isBegining = False
-
         elif s.lower() in alpha:
             output += s.lower()
 
-            isSpacePresent = False
-            isNewLineCPresent = False
-            isBegining = False
-
+        isSpacePresent = False
+        isNewLineCPresent = False
+        isBegining = False
+    
     return isNewLineCPresent, output
 
 
-# def compute_entropy():
+def compute_entropy(n: int, freq_dict: dict):
+    ngr_count = sum(freq_dict.values())
+    entropy = 0
+    for freq in freq_dict.values():
+        entropy -= (freq / ngr_count) * log2(freq / ngr_count)
+
+    return entropy / n
 
 
 def fLine_gen(fPath: str):
@@ -91,32 +93,7 @@ if __name__ == "__main__":
         freq_count(fLine, 1, onegr_wo_int_dict) # w/o ngram interceptions
         freq_count(fLine, 1, onegr_w_int_dict, True) # w ngram interceptions
 
-    bigr_wo_int_dict = {i: bigr_wo_int_dict[i] for i in sorted(bigr_wo_int_dict.keys())}
-    bigr_w_int_dict = {i: bigr_w_int_dict[i] for i in sorted(bigr_w_int_dict.keys())}
-    onegr_wo_int_dict = {i: onegr_wo_int_dict[i] for i in sorted(onegr_wo_int_dict.keys())}
-    onegr_w_int_dict = {i: onegr_w_int_dict[i] for i in sorted(onegr_w_int_dict.keys())}
-
-    print(bigr_wo_int_dict)
-    print(bigr_w_int_dict)
-
-    ent_2_1, ent_2_2 = 0, 0
-
-    for v in bigr_wo_int_dict.values():
-        ent_2_1 -= (v/(sum(bigr_wo_int_dict.values()))) * math.log2(v/(sum(bigr_wo_int_dict.values())))
-    
-    for v in bigr_w_int_dict.values():
-        ent_2_2 -= (v/(sum(bigr_w_int_dict.values()))) * math.log2(v/(sum(bigr_w_int_dict.values())))
-
-    print(ent_2_1/2, ent_2_2/2, '\n', sum(bigr_wo_int_dict.values()), sum(bigr_w_int_dict.values()))
-    
-    ent_1_1, ent_1_2 = 0, 0
-    for v in onegr_w_int_dict.values():
-        ent_1_1 -= (v/(sum(onegr_w_int_dict.values()))) * math.log2(v/(sum(onegr_w_int_dict.values())))
-    
-    for v in onegr_wo_int_dict.values():
-        ent_1_2 -= (v/(sum(onegr_wo_int_dict.values()))) * math.log2(v/(sum(onegr_wo_int_dict.values())))
-
-    
-    print(ent_1_1, ent_1_2, '\n', sum(onegr_wo_int_dict.values()), sum(onegr_w_int_dict.values()))
-    # print(onegr_wo_int_dict)
-    # print(onegr_w_int_dict)
+    print(compute_entropy(2, bigr_w_int_dict),
+          compute_entropy(2, bigr_wo_int_dict), '\n', 
+          compute_entropy(1, onegr_w_int_dict), 
+          compute_entropy(1, onegr_wo_int_dict))
