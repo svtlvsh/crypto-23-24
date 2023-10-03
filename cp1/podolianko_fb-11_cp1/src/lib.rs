@@ -127,10 +127,15 @@ pub fn print_bigram_freq_table(freq_map: &HashMap<String, f64>) {
         for x in 0..table_x {
             let key: String = [first_chars_sorted[y], second_chars_sorted[x]].iter().collect();
             let f = freq_map.get(&key).unwrap_or(&0f64);
-            print!("|{:^wp$.fp$}", f, wp = cell_width, fp = if *f == 0f64 { 0 } else { float_precision });
+            let formatted_freq: String = if *f == 0f64 {format!("{:^wp$}", "-", wp = cell_width)} else {format!("{:^wp$.fp$}", f, wp = cell_width, fp =  float_precision)};
+            print!("|{formatted_freq}");
         }
         println!("|");
     }
+}
+
+pub fn redundancy(h_inf: f64, h_0: f64) -> f64 {
+    1f64 - (h_inf / h_0)
 }
 
 #[cfg(test)]
