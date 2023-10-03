@@ -40,7 +40,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Letter frequencies with whitespaces:\n");
     print_freq_plain(&pmap, 5, 4);
-    println!("Entropy: {entropy}\n", entropy = entropy);
+    println!("Entropy: {entropy}", entropy = entropy);
+    println!("Redundancy: {}", redundancy(entropy, ((VALID_LETTERS.chars().count() as f64 + 1f64) as f64 ).log2()));
+    println!();
 
     // Without whitespaces
     let pmap = ngram_frequencies(&without_whitespace, 1, false)?;
@@ -48,7 +50,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Letter frequencies without whitespaces:\n");
     print_freq_plain(&pmap, 5, 4);
-    println!("Entropy: {entropy}\n", entropy = entropy);
+    println!("Entropy: {entropy}", entropy = entropy);
+    println!("Redundancy: {}", redundancy(entropy, (VALID_LETTERS.chars().count() as f64 ).log2()));
+    println!();
 
     // Bigram frequency calculations
 
@@ -58,7 +62,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Bigram frequencies overlapping, with whitespace:\n");
     print_bigram_freq_table(&pmap);
-    println!("Entropy per character: {}\n", entropy / 2f64);
+    let entropy_per_char = entropy / 2f64;
+    println!("Entropy per character: {}", entropy_per_char);
+    println!("Redundancy: {}", redundancy(entropy_per_char, ((VALID_LETTERS.chars().count() as f64 + 1f64) as f64 ).log2()));
+    println!();
 
     // Overlapping, without whitespaces
     let pmap = ngram_frequencies(&without_whitespace, 2, true)?;
@@ -66,7 +73,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Bigram frequencies overlapping, without whitespace:\n");
     print_bigram_freq_table(&pmap);
-    println!("Entropy per character: {}\n", entropy / 2f64);
+    let entropy_per_char = entropy / 2f64;
+    println!("Entropy per character: {}", entropy_per_char);
+    println!("Redundancy: {}", redundancy(entropy_per_char, (VALID_LETTERS.chars().count() as f64 as f64 ).log2()));
+    println!();
 
     // Non-overlapping, whitespaces
     let pmap = ngram_frequencies(&with_whitespace, 2, false)?;
@@ -74,7 +84,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Bigram frequencies non-overlapping, with whitespace:\n");
     print_bigram_freq_table(&pmap);
-    println!("Entropy per character: {}\n", entropy / 2f64);
+    let entropy_per_char = entropy / 2f64;
+    println!("Entropy per character: {}", entropy_per_char);
+    println!("Redundancy: {}", redundancy(entropy_per_char, ((VALID_LETTERS.chars().count() as f64 + 1f64) as f64 ).log2()));
+    println!();
 
     // Non-overlapping, without whitespaces
     let pmap = ngram_frequencies(&without_whitespace, 2, false)?;
@@ -82,7 +95,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Bigram frequencies non-overlapping, without whitespace:\n");
     print_bigram_freq_table(&pmap);
-    println!("Entropy per character: {}\n", entropy / 2f64);
+    let entropy_per_char = entropy / 2f64;
+    println!("Entropy per character: {}", entropy_per_char);
+    println!("Redundancy: {}", redundancy(entropy_per_char, (VALID_LETTERS.chars().count() as f64 ).log2()));
+    println!();
 
     //
 
