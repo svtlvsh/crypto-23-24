@@ -79,3 +79,16 @@ def count_bigram_frequency_without_spaces(filepath, step=1):   # Частота 
     total_count = sum(bigram_dict.values())
     bigram_frequency = {bigram: count / total_count for bigram, count in bigram_dict.items()}
     return bigram_frequency
+
+def output_list(frequency: dict):
+    text = ""
+    for element in frequency:
+        print(element, round(frequency[element], 5))
+        text += f"{element},{round(frequency[element], 5)}\n"
+    save_text("list.csv", text)
+
+
+
+if __name__ == "__main__":
+    print(count_bigram_frequency(path))
+    output_list(count_letter_frequency(path))
