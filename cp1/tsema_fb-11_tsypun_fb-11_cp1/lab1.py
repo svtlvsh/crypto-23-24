@@ -24,7 +24,6 @@ def bigram_freq_csv_table(bgr_dict: dict, w_spaces=False):
     for w in alpha + int(w_spaces) * " ":
         output += "\n" + w + "," + ",".join([str(bgr_dict[w + j]) if (w + j) in bgr_dict.keys() else '-' for j in alpha + int(w_spaces) * " "]) 
 
-    # output += "\n" + ",".join([str(bgr_dict[" " + j]) if (w + j) in bgr_dict.keys() else '-' for j in alpha + int(w_spaces) * " "])
     return output
 
 
@@ -81,6 +80,12 @@ def compute_entropy(n: int, freq_dict: dict):
     return entropy / n
 
 
+def compute_redudancy(n: int, freq_dict: dict):
+    entropy = compute_entropy(n, freq_dict)
+
+    return 1 - (entropy/log2(len(alpha)))
+
+
 def fLine_gen(fPath: str):
     with open(fPath, "r", encoding="utf8") as hFile:
         while fLine := hFile.readline():
@@ -93,7 +98,6 @@ if __name__ == "__main__":
         for fLine in fLine_gen("lab_text.txt"):
             isnlp, pur_line = text_purification(fLine, isnlp, True)
             hFile.writelines(pur_line)
-            # print(pur_line)
 
     hFile.close()
 
@@ -102,7 +106,6 @@ if __name__ == "__main__":
         for fLine in fLine_gen("lab_text.txt"):
             isnlp, pur_line = text_purification(fLine, isnlp)
             hFile.writelines(pur_line)
-            # print(pur_line)
 
     hFile.close()
 
@@ -131,9 +134,12 @@ if __name__ == "__main__":
 
     print(10*"=" + "\nText with spaces\n" + 10*"=")
 
-    print("H2 in text with interceptions: " + str(compute_entropy(2, bigr_w_int_dict)) + '\n' +
-          "H2 in text w/o interceptions: " + str(compute_entropy(2, bigr_wo_int_dict)) + '\n' +
-          "H1 in text: " + str(compute_entropy(1, monogr_dict)) + '\n')
+    print("H2 in text, with interceptions: " + str(compute_entropy(2, bigr_w_int_dict)) + '\n' +
+          "R2 in text, with interceptions: " + str(compute_redudancy(2, bigr_w_int_dict)) + '\n' + 
+          "H2 in text, w/o interceptions: " + str(compute_entropy(2, bigr_wo_int_dict)) + '\n' +
+          "R2 in text, w/o interceptions: " + str(compute_redudancy(2, bigr_wo_int_dict)) + '\n' + 
+          "H1 in text: " + str(compute_entropy(1, monogr_dict)) + '\n' + 
+          "R1 in text: " + str(compute_redudancy(1, monogr_dict)))
     
     with open("purified_text_w_null.txt", "r", encoding="utf8") as hFile:
         text_wo_s = hFile.read()
@@ -160,6 +166,9 @@ if __name__ == "__main__":
     
     print(10*"=" + "\nText w/o spaces\n" + 10*"=")
 
-    print("H2 in text with interceptions: " + str(compute_entropy(2, bigr_w_int_dict)) + '\n' +
-          "H2 in text w/o interceptions: " + str(compute_entropy(2, bigr_wo_int_dict)) + '\n' +
-          "H1 in text: " + str(compute_entropy(1, monogr_dict)) + '\n')
+    print("H2 in text, with interceptions: " + str(compute_entropy(2, bigr_w_int_dict)) + '\n' +
+          "R2 in text, with interceptions: " + str(compute_redudancy(2, bigr_w_int_dict)) + '\n' + 
+          "H2 in text, w/o interceptions: " + str(compute_entropy(2, bigr_wo_int_dict)) + '\n' +
+          "R2 in text, w/o interceptions: " + str(compute_redudancy(2, bigr_wo_int_dict)) + '\n' + 
+          "H1 in text: " + str(compute_entropy(1, monogr_dict)) + '\n' + 
+          "R1 in text: " + str(compute_redudancy(1, monogr_dict)))
