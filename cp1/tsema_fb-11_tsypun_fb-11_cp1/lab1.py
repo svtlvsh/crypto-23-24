@@ -19,6 +19,23 @@ def freq_count(text: str, n: int, ngr_intercept=False) -> dict[str, float]:
     return {i: ngr_dict[i] / sum(ngr_dict.values()) for i in sorted(ngr_dict.keys())}
 
 
+def bigram_freq_csv_table(bgr_dict: dict, w_spaces=False):
+    output = "*," + ",".join(alpha + int(w_spaces) * " ")
+    for w in alpha + int(w_spaces) * " ":
+        output += "\n" + w + "," + ",".join([str(bgr_dict[w + j]) if (w + j) in bgr_dict.keys() else '-' for j in alpha + int(w_spaces) * " "]) 
+
+    # output += "\n" + ",".join([str(bgr_dict[" " + j]) if (w + j) in bgr_dict.keys() else '-' for j in alpha + int(w_spaces) * " "])
+    return output
+
+
+def monogr_freq_csv_table(monogr_dict: dict):
+    output = ""
+    for item in monogr_dict.items():
+        output += ",".join([str(i) for i in item]) + "\n"
+
+    return output
+
+
 def text_purification(fLine: str, isnlp=False, save_space=False) -> (bool, str):
     isSpacePresent = False
     isNewLineCPresent = isnlp
@@ -46,6 +63,9 @@ def text_purification(fLine: str, isnlp=False, save_space=False) -> (bool, str):
         elif s.lower() in alpha:
             output += s.lower()
 
+        else:
+            continue
+
         isSpacePresent = False
         isNewLineCPresent = False
         isBegining = False
@@ -68,40 +88,78 @@ def fLine_gen(fPath: str):
 
 
 if __name__ == "__main__":
-    # with open("purified_text_w_s.txt", "w", encoding="utf8") as hFile:
-    #     isnlp = False
-    #     for fLine in fLine_gen("lab_text.txt"):
-    #         isnlp, pur_line = text_purification(fLine, isnlp, True)
-    #         hFile.writelines(pur_line)
-    #         print(pur_line)
-
-    # hFile.close()
-
-    # with open("purified_text_w_null.txt", "w", encoding="utf8") as hFile:
-    #     isnlp = False
-    #     for fLine in fLine_gen("lab_text.txt"):
-    #         isnlp, pur_line = text_purification(fLine, isnlp)
-    #         hFile.writelines(pur_line)
-    #         print(pur_line)
-
-    # hFile.close()
-
-    with open("purified_text_w_s.txt", "r", encoding="utf8") as hFile:
-        text = hFile.read()
+    with open("purified_text_w_s.txt", "w", encoding="utf8") as hFile:
+        isnlp = False
+        for fLine in fLine_gen("lab_text.txt"):
+            isnlp, pur_line = text_purification(fLine, isnlp, True)
+            hFile.writelines(pur_line)
+            # print(pur_line)
 
     hFile.close()
 
-    bigr_wo_int_dict = freq_count(text, 2)          # w/o ngram interceptions
-    bigr_w_int_dict = freq_count(text, 2, True)     # w ngram interceptions
-    onegr_wo_int_dict = freq_count(text, 1)         # w/o ngram interceptions
-    onegr_w_int_dict = freq_count(text, 1, True)    # w ngram interceptions
+    with open("purified_text_w_null.txt", "w", encoding="utf8") as hFile:
+        isnlp = False
+        for fLine in fLine_gen("lab_text.txt"):
+            isnlp, pur_line = text_purification(fLine, isnlp)
+            hFile.writelines(pur_line)
+            # print(pur_line)
 
-    print(bigr_wo_int_dict)
-    print(bigr_w_int_dict)
-    print(onegr_wo_int_dict)
-    print(onegr_w_int_dict)
+    hFile.close()
 
-    print(compute_entropy(2, bigr_w_int_dict),
-          compute_entropy(2, bigr_wo_int_dict), '\n', 
-          compute_entropy(1, onegr_w_int_dict), 
-          compute_entropy(1, onegr_wo_int_dict))
+    with open("purified_text_w_s.txt", "r", encoding="utf8") as hFile:
+        text_w_s = hFile.read()
+    hFile.close()
+
+    bigr_wo_int_dict = freq_count(text_w_s, 2)          # w/o ngram interceptions
+    bigr_w_int_dict = freq_count(text_w_s, 2, True)     # w ngram interceptions
+    monogr_dict = freq_count(text_w_s, 1, True)         # w ngram interceptions
+
+    with open("lab1_bigram_with_interceptions_in_text_with_spaces.csv", "w", encoding="utf8") as csv_write:
+        csv_write.write(bigram_freq_csv_table(bigr_w_int_dict, True))
+
+    csv_write.close()
+
+    with open("lab1_bigram_without_interceptions_in_text_with_spaces.csv", "w", encoding="utf8") as csv_write:
+        csv_write.write(bigram_freq_csv_table(bigr_wo_int_dict, True))
+
+    csv_write.close()
+
+    with open("lab1_monogram_in_text_with_spaces.csv", "w", encoding="utf8") as csv_write:
+        csv_write.write(monogr_freq_csv_table(monogr_dict))
+
+    csv_write.close()
+
+    print(10*"=" + "\nText with spaces\n" + 10*"=")
+
+    print("H2 in text with interceptions: " + str(compute_entropy(2, bigr_w_int_dict)) + '\n' +
+          "H2 in text w/o interceptions: " + str(compute_entropy(2, bigr_wo_int_dict)) + '\n' +
+          "H1 in text: " + str(compute_entropy(1, monogr_dict)) + '\n')
+    
+    with open("purified_text_w_null.txt", "r", encoding="utf8") as hFile:
+        text_wo_s = hFile.read()
+    hFile.close()
+    
+    bigr_wo_int_dict = freq_count(text_wo_s, 2)          # w/o ngram interceptions
+    bigr_w_int_dict = freq_count(text_wo_s, 2, True)     # w ngram interceptions
+    monogr_dict = freq_count(text_wo_s, 1, True)         # w ngram interceptions
+
+    with open("lab1_bigram_with_interceptions_in_text_without_spaces.csv", "w", encoding="utf8") as csv_write:
+        csv_write.write(bigram_freq_csv_table(bigr_w_int_dict))
+
+    csv_write.close()
+
+    with open("lab1_bigram_without_interceptions_in_text_without_spaces.csv", "w", encoding="utf8") as csv_write:
+        csv_write.write(bigram_freq_csv_table(bigr_wo_int_dict))
+
+    csv_write.close()
+
+    with open("lab1_monogram_in_text_without_spaces.csv", "w", encoding="utf8") as csv_write:
+        csv_write.write(monogr_freq_csv_table(monogr_dict))
+
+    csv_write.close()
+    
+    print(10*"=" + "\nText w/o spaces\n" + 10*"=")
+
+    print("H2 in text with interceptions: " + str(compute_entropy(2, bigr_w_int_dict)) + '\n' +
+          "H2 in text w/o interceptions: " + str(compute_entropy(2, bigr_wo_int_dict)) + '\n' +
+          "H1 in text: " + str(compute_entropy(1, monogr_dict)) + '\n')
