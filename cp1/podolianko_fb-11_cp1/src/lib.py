@@ -1,6 +1,7 @@
 from typing import Iterable, Dict
 from math import log2
 import re
+import functools
 
 VALID_LETTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
 
@@ -9,7 +10,7 @@ def entropy_from_probabilities(probabilities: Iterable) -> float:
     """Calculate entropy on `probabilities` (log2)"""
     return -sum(map(lambda p: p * log2(p), probabilities))
 
-
+@functools.cache
 def normalize_string(string: str, alphabet: str, preserve_whitespace: bool) -> str:
     """returns lowercase string consisting only of `alphabet` characters, or also single whitespaces between words, if `preserve_whitespace` is true."""
     lower_string = string.lower()
