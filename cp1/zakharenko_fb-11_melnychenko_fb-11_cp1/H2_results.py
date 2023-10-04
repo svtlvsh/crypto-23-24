@@ -36,16 +36,7 @@ def calculate_entropy(FROM_FILE, overlap, no_spaces):
     return h2 / 2
 
 
-#бля в термінал не поміститься, вивід у файл робити я не хочу, просто в коми будем їх по черзі запихати ок
 print("no spaces no overlap")
 print(f"H2: {calculate_entropy('NOspaces_text.txt', overlap=False, no_spaces=True)}")
 
-#print("no spaces overlap")
-#print(f"H2: {calculate_entropy('NOspaces_text.txt', overlap=True, no_spaces=True)}")
-
-#print("spaces no overlap")
-#print(f"H2: {calculate_entropy('spaces_text.txt', overlap=False, no_spaces=False)}")
-
-#print("spaces overlap")
-#print(f"H2: {calculate_entropy('spaces_text.txt', overlap=True, no_spaces=False)}")
 
