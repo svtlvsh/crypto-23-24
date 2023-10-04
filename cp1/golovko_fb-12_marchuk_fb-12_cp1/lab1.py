@@ -14,6 +14,16 @@ def entropy(original_text,letter_freq):
     entropy=float(0)
     for chastota in letter_freq.values():
         entropy+=(chastota/len(original_text))*math.log2(chastota/len(original_text))
+    return -entropy 
+def entropy_bigram_with_overlap(bigram_amount,letter_freq):
+    entropy=float(0)
+    for chastota in letter_freq.values():
+        entropy+=(chastota/(len(bigram_amount)-1))*math.log2(chastota/(len(bigram_amount)-1))
+    return -entropy
+def entropy_bigram_without_overlap(bigram_amount,letter_freq):
+    entropy=float(0)
+    for chastota in letter_freq.values():
+        entropy+=(chastota/(len(bigram_amount)/2))*math.log2(chastota/(len(bigram_amount)/2))
     return -entropy
 def find_freq(formated_text):
     letter_frequency = {}
@@ -56,14 +66,13 @@ def print_freq(let_freq,formated_text):
     for letter, frequency in sorted(let_freq.items(), key=lambda x:x[1], reverse=True):
         print(f"{letter}: {frequency},    %= {round(int(frequency)/len(formated_text)*100,3)}")
     return None
-def nadlishkovist_without_spaces(entropy):
-    return 1-(entropy/math.log2(33))
-def nadlishkovist(entropy):
-    return 1-(entropy/math.log2(34))
-def nadlishkovist_without_spaces_bigram(entropy):
-    return 1-(entropy/math.log2(1089))
-def nadlishkovist_with_spaces_bigram(entropy):
-    return 1-(entropy/math.log2(1156))
+def nadlishkovist_monogram(entropy,original_text):
+    return 1-(entropy/math.log2(len(original_text)))
+
+def nadlishkovist_bigram_with_overlap(entropy,original_text):
+    return 1-(entropy/math.log2(len(original_text)-1))
+def nadlishkovist_bigram_without_overlap(entropy,original_text):
+    return 1-(entropy/math.log2(len(original_text)/2))
 
 input_file_path = 'D:\\uni year 3\\crypto labs\\tasks\\cp1\\test.txt'
 with open(input_file_path, 'r', encoding='utf-8') as file:
@@ -94,23 +103,29 @@ output_with_spaces_bi_freq_without_overlap=find_freq_3(output_with_spaces)
 # print_freq(output_without_spaces_bi_freq_without_overlap,output_without_spaces)
 # print_freq(output_with_spaces_bi_freq_without_overlap,output_with_spaces)
 
-print("entropy with spaces",entropy(output_with_spaces,output_with_spaces_freq))
-print("R=",nadlishkovist(entropy(output_with_spaces,output_with_spaces_freq)))
+entropy_with_spaces=entropy(output_with_spaces,output_with_spaces_freq)
+entropy_without_spaces=entropy(output_without_spaces,output_without_spaces_freq)
+entropy_without_spaces_bigram=entropy_bigram_with_overlap(output_without_spaces,output_without_spaces_bi_freq)
+entropy_with_spaces_bigram=entropy_bigram_with_overlap(output_with_spaces,output_with_spaces_bi_freq)
+entropy_without_spaces_bigram_without_overlap=entropy_bigram_without_overlap(output_without_spaces,output_without_spaces_bi_freq_without_overlap)
+entropy_with_spaces_bigram_without_overlap=entropy_bigram_without_overlap(output_with_spaces,output_with_spaces_bi_freq_without_overlap)
+print("entropy with spaces",entropy_with_spaces)
+print("R=",nadlishkovist_monogram(entropy_with_spaces,output_with_spaces))
 print("******")
-print("entropy without spaces",entropy(output_without_spaces,output_without_spaces_freq))
-print("R=",nadlishkovist_without_spaces(entropy(output_without_spaces,output_without_spaces_freq)))
+print("entropy without spaces",entropy_without_spaces)
+print("R=",nadlishkovist_monogram(entropy_without_spaces,output_without_spaces))
 print("******")
-print("entropy without spaces bigram",entropy(output_without_spaces,output_without_spaces_bi_freq))
-print("R=",nadlishkovist_without_spaces_bigram(entropy(output_without_spaces,output_without_spaces_bi_freq)))
+print("entropy without spaces bigram",entropy_without_spaces_bigram)
+print("R=",nadlishkovist_bigram_with_overlap(entropy_without_spaces_bigram,output_without_spaces))
 print("******")
-print("entropy with spaces bigram",entropy(output_with_spaces,output_with_spaces_bi_freq))
-print("R=",nadlishkovist_with_spaces_bigram(entropy(output_with_spaces,output_with_spaces_bi_freq)))
+print("entropy with spaces bigram",entropy_with_spaces_bigram)
+print("R=",nadlishkovist_bigram_with_overlap(entropy_with_spaces_bigram,output_with_spaces))
 print("******")
-print("entropy without spaces bigram without overlap",entropy(output_without_spaces,output_without_spaces_bi_freq_without_overlap))
-print("R=",nadlishkovist_without_spaces_bigram(entropy(output_without_spaces,output_without_spaces_bi_freq_without_overlap)))
+print("entropy without spaces bigram without overlap",entropy_without_spaces_bigram_without_overlap)
+print("R=",nadlishkovist_bigram_without_overlap(entropy_without_spaces_bigram_without_overlap,output_without_spaces))
 print("******")
-print("entropy with spaces bigram without overlap",entropy(output_with_spaces,output_with_spaces_bi_freq_without_overlap))
-print("R=",nadlishkovist_with_spaces_bigram(entropy(output_with_spaces,output_with_spaces_bi_freq_without_overlap)))
+print("entropy with spaces bigram without overlap",entropy_with_spaces_bigram_without_overlap)
+print("R=",nadlishkovist_bigram_without_overlap(entropy_with_spaces_bigram_without_overlap,output_with_spaces))
 
 output_without_spaces_path = 'D:\\uni year 3\\crypto labs\\tasks\\cp1\\output without spaces.txt'
 with open(output_without_spaces_path, 'w', encoding='utf-8') as file:
