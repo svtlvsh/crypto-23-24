@@ -33,12 +33,14 @@ def count_letters(filepath):    # Підрахунок символів у те�
             letter_dict[letter] += 1
         else:
             letter_dict[letter] = 1
+    letter_dict = dict(sorted(letter_dict.items(), key=lambda x: x[1], reverse=True))
     return letter_dict
 
 def count_letter_frequency(filepath):    # Підрахунок частоти символів
     letter_dict = count_letters(filepath)
     total_count = sum(letter_dict.values())   # Повна кількість символів
     letter_frequency = {letter: count / total_count for letter, count in letter_dict.items()}
+    letter_frequency = dict(sorted(letter_frequency.items(), key=lambda x: x[1], reverse=True))
     return letter_frequency
 
 def count_letter_frequency_without_spaces(filepath):  # Підрахунок частоти символів без пробілів
@@ -47,6 +49,7 @@ def count_letter_frequency_without_spaces(filepath):  # Підрахунок ч�
     total_count_no_spaces = sum(letter_dict.values()) - spaces_count
     del letter_dict[' ']
     letters_frequency_without_spaces = {letter: count / total_count_no_spaces for letter, count in letter_dict.items()}
+    letters_frequency_without_spaces = dict(sorted(letters_frequency_without_spaces.items(), key=lambda x: x[1], reverse=True))
     return letters_frequency_without_spaces
 
 def count_bigrams(filepath, step=1):    # Підрахунок біграм з різним кроком
