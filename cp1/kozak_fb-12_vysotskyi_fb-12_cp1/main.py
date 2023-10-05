@@ -1,3 +1,4 @@
+from math import log2
 from re import sub
 
 path = "clean_text.txt"
@@ -107,6 +108,17 @@ def output_table(frequency: dict):
     print(text)
 
 
+def calculate_entropy(frequencies: dict) -> float:
+    entropy = 0.0
+    for frequency in frequencies.values():
+        entropy -= frequency*log2(frequency)
+    return entropy
+
+
+def calculate_redundancy(entropy: float, spaces_removed=False) -> float:
+    alphabet_power = 33 if spaces_removed else 34
+    h0 = log2(alphabet_power)
+    return 1-entropy/h0
 
 
 if __name__ == "__main__":
@@ -114,3 +126,5 @@ if __name__ == "__main__":
     # print(count_bigram_frequency(path))
     output_table(count_bigram_frequency(path))
     text += output_list(count_letter_frequency(path))
+    entropy = calculate_entropy(count_letter_frequency_without_spaces(path))
+    print(entropy, calculate_redundancy(entropy, True))
