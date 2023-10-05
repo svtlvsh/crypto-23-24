@@ -52,7 +52,7 @@ def count_bigrams(filepath, step=1):    # Підрахунок біграм з �
     text = read_text(filepath)
     bigram_dict = {}
     for i in range(0, len(text) - 1, step):
-        bigram = text[i:i+2]
+        bigram = text[i:i+2].replace(" ", "_")
         if bigram in bigram_dict:
             bigram_dict[bigram] += 1
         else:
@@ -83,12 +83,34 @@ def count_bigram_frequency_without_spaces(filepath, step=1):   # Частота 
 def output_list(frequency: dict):
     text = ""
     for element in frequency:
-        print(element, round(frequency[element], 5))
-        text += f"{element},{round(frequency[element], 5)}\n"
-    save_text("list.csv", text)
+        print(element, round(frequency[element], 4))
+        text += f"{element},{round(frequency[element], 4)}\n"
+    return text
+
+
+def output_table(frequency: dict):
+    rows = []
+    first_letters_dublicated = [x[0] for x in frequency.keys()]
+    first_letters = []
+    [first_letters.append(x) for x in first_letters_dublicated if x not in first_letters]
+    second_letters_dublicated = [x[1] for x in frequency.keys()]
+    second_letters = []
+    [second_letters.append(x) for x in second_letters_dublicated if x not in second_letters]
+    text = "\  " + "-     ".join(first_letters) + "-     \n"
+    for second_letter in second_letters:
+        text += "-" + second_letter + " "
+        for first_letter in first_letters:
+            bigram = first_letter+second_letter
+            text += f"{round(frequency[bigram], 4) if bigram in frequency else 0:0<6} "
+        text += "\n"
+
+    print(text)
+
 
 
 
 if __name__ == "__main__":
-    print(count_bigram_frequency(path))
-    output_list(count_letter_frequency(path))
+    text = ""
+    # print(count_bigram_frequency(path))
+    output_table(count_bigram_frequency(path))
+    text += output_list(count_letter_frequency(path))
