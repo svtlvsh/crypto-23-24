@@ -97,9 +97,9 @@ def output_table(frequency: dict) -> str:
     second_letters_dublicated = [x[1] for x in frequency.keys()]
     second_letters = []
     [second_letters.append(x) for x in second_letters_dublicated if x not in second_letters]
-    text = "\  " + "-     ".join(first_letters) + "-     \n"
+    text = "\\  " + "-     ".join(first_letters) + "-     \n"
     for second_letter in second_letters:
-        text += "-" + second_letter + " "
+        text += "'-" + second_letter + " "
         for first_letter in first_letters:
             bigram = first_letter+second_letter
             text += f"{round(frequency[bigram], 4) if bigram in frequency else 0:0<6} "
@@ -138,6 +138,8 @@ if __name__ == "__main__":
         text += output_table(frequencies)
 
     for frequencies in all_frequencies:
-        entropy = calculate_entropy(frequencies)
-        redundancy = calculate_redundancy(entropy, len(frequencies))
+        entropy = round(calculate_entropy(frequencies), 5)
+        redundancy = round(calculate_redundancy(entropy, len(frequencies)), 5)
+        text += f"{entropy} {redundancy}\n"
         print(entropy, redundancy)
+    save_text("data.csv", text)
