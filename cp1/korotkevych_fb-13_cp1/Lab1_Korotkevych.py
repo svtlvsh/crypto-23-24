@@ -29,19 +29,19 @@ def count_bigram(text):
 
     return dict(bigram_pair)
 
-# def count_bigram_2(text):
-#     bigram_count = 0
-#     bigram_pair = defaultdict(float)
+def count_bigram_2(text):
+    bigram_count = 0
+    bigram_pair = defaultdict(float)
 
-#     for i in range(0, len(text) - 1, 2):
-#         non_overlapping_bigram = text[i:i + 2]
-#         bigram_pair[non_overlapping_bigram] += 1
-#         bigram_count += 1
+    for i in range(0, len(text) - 1, 2):
+        non_overlapping_bigram = text[i:i + 2]
+        bigram_pair[non_overlapping_bigram] += 1
+        bigram_count += 1
 
-#     for key, value in bigram_pair.items():
-#         bigram_pair[key] /= bigram_count
+    for key, value in bigram_pair.items():
+        bigram_pair[key] /= bigram_count
 
-#     return dict(bigram_pair)
+    return dict(bigram_pair)
 
 def letter_entropy(pair):
     entropy = 0.0
@@ -65,6 +65,7 @@ with open("/home/kali/Desktop/cryptolab1/scripts2_with_no_space.txt", "r") as fi
 
     letters = count_letters(text2)
     bigrams = count_bigram(text2)
+    bigrams_with_step = count_bigram_2(text2)
 
     for key, value in letters.items():
         file_output.write("\n")
@@ -74,6 +75,11 @@ with open("/home/kali/Desktop/cryptolab1/scripts2_with_no_space.txt", "r") as fi
         file_output.write("\n")
         file_output.write(f"{key}:{value}")
 
+    for key, value in bigrams_with_step.items():
+        file_output.write("\n")
+        file_output.write(f"{key}:{value}")
+
 
     file_output.write(f"\nLetter entropy: {letter_entropy(letters)}")
     file_output.write(f"\nBigram entropy: {bigram_entropy(bigrams)}")
+    file_output.write(f"\nBigram entropy with step 2: {bigram_entropy(bigrams_with_step)}")
