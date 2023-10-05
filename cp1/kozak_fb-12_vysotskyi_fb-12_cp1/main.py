@@ -89,7 +89,7 @@ def output_list(frequency: dict):
     return text
 
 
-def output_table(frequency: dict):
+def output_table(frequency: dict) -> str:
     rows = []
     first_letters_dublicated = [x[0] for x in frequency.keys()]
     first_letters = []
@@ -106,6 +106,7 @@ def output_table(frequency: dict):
         text += "\n"
 
     print(text)
+    return text
 
 
 def calculate_entropy(frequencies: dict) -> float:
@@ -115,16 +116,28 @@ def calculate_entropy(frequencies: dict) -> float:
     return entropy
 
 
-def calculate_redundancy(entropy: float, spaces_removed=False) -> float:
-    alphabet_power = 33 if spaces_removed else 34
+def calculate_redundancy(entropy: float, alphabet_power: int) -> float:
     h0 = log2(alphabet_power)
     return 1-entropy/h0
 
 
 if __name__ == "__main__":
     text = ""
-    # print(count_bigram_frequency(path))
-    output_table(count_bigram_frequency(path))
-    text += output_list(count_letter_frequency(path))
-    entropy = calculate_entropy(count_letter_frequency_without_spaces(path))
-    print(entropy, calculate_redundancy(entropy, True))
+    letters = count_letter_frequency(path)
+    letters_no_spaces = count_letter_frequency_without_spaces(path)
+    bigrams_step_1 = count_bigram_frequency(path)
+    bigrams_step_2 = count_bigram_frequency(path, 2)
+    bigrams_step_1_no_spaces = count_bigram_frequency_without_spaces(path)
+    bigrams_step_2_no_spaces = count_bigram_frequency_without_spaces(path, 2)
+
+    text += output_list(letters)
+    text += output_list(letters_no_spaces)
+    bigram_frequencies = [bigrams_step_1, bigrams_step_2, bigrams_step_1_no_spaces, bigrams_step_2_no_spaces]
+    all_frequencies = [letters, letters_no_spaces] + bigram_frequencies
+    for frequencies in bigram_frequencies:
+        text += output_table(frequencies)
+
+    for frequencies in all_frequencies:
+        entropy = calculate_entropy(frequencies)
+        redundancy = calculate_redundancy(entropy, len(frequencies))
+        print(entropy, redundancy)
