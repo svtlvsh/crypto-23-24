@@ -7,7 +7,7 @@ def filter_text(input_text):
     filtered_text = filtered_text.lower()
     filtered_text = filtered_text.replace("ъ", "ь")
     filtered_text = filtered_text.replace("ё", "е")
-    filtered_text = re.sub(r'[^a-zа-я ]', ' ', filtered_text)
+    filtered_text = re.sub(r'[^a-z]', ' ', filtered_text)
     filtered_text = re.sub(r'\s+', ' ', filtered_text)
 
     return filtered_text
