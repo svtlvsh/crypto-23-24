@@ -133,6 +133,8 @@ bigrams = [letters[i] + letters[j] for i in range(len(letters)) for j in range(l
 
 global_bigram_count = 0
 global_bigram_entropy = 0
+global_bigram_ni_count = len(file_contents)/2
+global_bigram_ni_entropy = 0
 for bigram in bigrams:
     bigram_count = file_contents.count(bigram)
     global_bigram_count += bigram_count
