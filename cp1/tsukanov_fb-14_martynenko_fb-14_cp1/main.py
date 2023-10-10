@@ -1,5 +1,5 @@
 import math
-no_target_symb='\n'
+no_target_symb='\n '
 
 file_name = "res1.txt"
 
