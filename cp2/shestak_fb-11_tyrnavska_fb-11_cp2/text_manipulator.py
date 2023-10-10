@@ -1,4 +1,5 @@
 import re
+import csv
 
 
 # function for formatting text without spaces
@@ -18,6 +19,17 @@ def creating_valid_text_without_spaces(input_path, output_path):
 def get_text(path):
     with open(path, 'r', encoding="UTF-8") as reader:
         return reader.read()
+
+
+# get frequency dict
+def get_frequency(input_path):
+    res_dict = {}
+    with open(input_path, mode='r', newline='', encoding="UTF-8") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            res_dict[row[0]] = row[1]
+
+    return res_dict
 
 
 if __name__ == '__main__':
