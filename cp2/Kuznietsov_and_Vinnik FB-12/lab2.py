@@ -81,10 +81,9 @@ def index_vidpovidnosti():
     suma = (1/(len(text)*(len(text)-1))) * suma
     return print(suma)
 
-index_vidpovidnosti()
+#index_vidpovidnosti()
 
 def index_vidpovidnosti_help(text):
-
     dictionary = {}
     alphabet = 'абвгдежзийклмнопрстуфхцчшщъыьэюя'
 
@@ -98,7 +97,7 @@ def index_vidpovidnosti_help(text):
     suma = 0
     for i in alphabet:
         suma += dictionary[i] * (dictionary[i] - 1)
-    suma = (1/(len(text)*(len(text)-1))) * suma
+    suma = suma/(len(text)*(len(text)-1))
     return suma
 
 def find_r(r):
@@ -112,11 +111,25 @@ def find_r(r):
             array.append(n_gram)
 
     suma_r = 0
-    for i in range(0, len(array)-1):
+    for i in range(0, len(array)):
         suma_r += index_vidpovidnosti_help(array[i])
     suma_r = suma_r / len(array)
     return print(suma_r)
 
-for i in range(2, 30):
-    find_r(i)
+#for i in range(2, 32):
+    #find_r(i)
 
+def find_r_alternative(r):
+    with open("variant_2.txt", 'r', encoding='utf-8') as file:
+        text = file.read()
+
+    suma_r = 0
+    for offset in range(0, r):
+        array = "".join([text[i] for i in range(offset, len(text) - r + 1, r)])
+        suma_r += index_vidpovidnosti_help(array)
+
+    suma_r = suma_r / r
+    return print(suma_r)
+
+for i in range(2, 31):
+    find_r_alternative(i)
