@@ -17,7 +17,20 @@ def vigenere_cipher(plaintext, key):
     for i in range(0,len(plaintext)):
         encrypted_text.append(chr((ord(plaintext[i])-1071+ord(key_repeated[i])-1071)%32 +1070))
     return "".join(encrypted_text)
+def vigenere_decrypt(ciphertext, key):
+    ciphertext = ciphertext.lower()
+    key = key.lower()
+    alphabet = 'абвгдежзийклмнопрстуфхцчшщъыьэюя'
+    decrypted_text = ''
 
+    for i in range(len(ciphertext)):
+        if ciphertext[i] in alphabet:
+            shift = (alphabet.index(ciphertext[i]) - alphabet.index(key[i % len(key)])) % 32
+            decrypted_text += alphabet[shift]
+        else:
+            decrypted_text += ciphertext[i]
+
+    return decrypted_text
 
 def find_freq(formated_text):
     letter_frequency = {}
@@ -50,8 +63,8 @@ def calc_IC_block(text,r):
         temp_freq=find_freq(new_block)
         temp_ic+=calc_IC(temp_freq,len(new_block))
     return temp_ic/r
-def calc_IC_block(text,r):
-    temp_ic=0
+
+def get_key(text,r):
     for j in range(0,r):
         new_block=[]
         for i in range(0,len(text)+1,r):
@@ -60,9 +73,15 @@ def calc_IC_block(text,r):
             except:
                 break
         temp_freq=find_freq(new_block)
-        temp_ic+=calc_IC(temp_freq,len(new_block))
-    return temp_ic/r
-def get_key(text,r):
+        # print_freq(temp_freq,new_block)
+        o_enc=max(temp_freq, key=temp_freq.get)
+        # print(o_enc)
+        if ord(o_enc)-1086>0:
+            print(chr(ord(o_enc)-14),end="")
+        else:
+            print(chr((ord(o_enc)-1070+16)%32+1072),end="")
+    return "."
+def get_key2(text,r):
     for j in range(0,r):
         new_block=[]
         for i in range(0,len(text)+1,r):
@@ -73,21 +92,18 @@ def get_key(text,r):
         temp_freq=find_freq(new_block)
         o_enc=max(temp_freq, key=temp_freq.get)
         # print(o_enc)
-        if ord(o_enc)-1086>0:
-            print(chr(ord(o_enc)-14),end="")
+        if ord(o_enc)-1077>0:
+            print(chr(ord(o_enc)-5),end="")
         else:
-            print(chr((ord(o_enc)-1070+16)%32+1072),end="")
-        # decrypted_letter=chr((ord("о")-1071+ord(o_enc)-1071)%32 +1070)
-        # print_freq(temp_freq,new_block)
+            print(chr((ord(o_enc)-1070+7)%32+1072),end="")
     return "."
-    
 def theoretical_ic(letter_freq,text_length):
     result=float()
     for i in letter_freq.values():
         result+=(float(i)/text_length)**2
     return result
 
-input_file_path = 'D:\\uni year 3\\crypto labs\\crypto-23-24\\cp2\\test.txt'
+input_file_path = 'D:\\uni year 3\\crypto labs\\crypto-23-24\\cp2\\Igor_Marchuk_Maria_holovko_FB-12\\test.txt'
 with open(input_file_path, 'r', encoding='utf-8') as file:
 
     text = file.read()
@@ -98,7 +114,7 @@ text1_freq=find_freq(text)
 # print(calc_IC(text1_freq,len(text)))
 
 # Read input text from a file
-input_file = "D:\\uni year 3\\crypto labs\\crypto-23-24\\cp2\\input_to_cipher.txt"
+input_file = "D:\\uni year 3\\crypto labs\\crypto-23-24\\cp2\\Igor_Marchuk_Maria_holovko_FB-12\\input_to_cipher.txt"
 with open(input_file, "r",encoding='utf-8') as file:
     plaintext = file.read()
 # Specify the key
@@ -153,8 +169,18 @@ crypto5=vigenere_cipher(plaintext,"арбуз")
 
 
 task_freq=find_freq(text)
+for i in range (1,32):
+    print(i,"=",calc_IC_block(text,i))
 # print_freq(task_freq,text)
 # print(theoretical_ic(task_freq,len(text)))
 # for i in range (1,32):
 #     print(i,"=",calc_IC_block(text,i))
 print(get_key(text,12))
+print(get_key2(text,12))
+print(vigenere_decrypt(text,"вшекспирбуря"))
+# word1='вшебспирбуря'
+# word2='лбокъшсщккщи'
+# for i in range(len(word1)):
+#     for j in range(len(word2)):
+#         combined_word = word1[:i] + word2[j] + word1[i+1:]
+#         print(combined_word)
