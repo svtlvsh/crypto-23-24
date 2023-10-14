@@ -31,10 +31,10 @@ def encryption(key: str, input_text: str) -> str:
         encrypted_char_index = (ALPHABET.index(char) + ALPHABET.index(key[key_index])) % len(ALPHABET)
         encrypted_char = ALPHABET[encrypted_char_index]
         encrypted_text += encrypted_char
-        key_index += (key_index + 1) % len(key)
+        key_index = (key_index + 1) % len(key)
     return encrypted_text
 
 
 # text = file_read('task1.txt')
 # text = text_edit(text)
-# print(encryption(KEYS[0], text))
+# print(encryption(KEYS[5], text))
