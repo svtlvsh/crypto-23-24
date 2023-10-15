@@ -78,5 +78,8 @@ def main():
     create_csv_file('Affinities.csv', affinity_dict)
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
+text: str = file_read('task1.txt')
+text = text_edit(text)
+print(encryption(KEYS[0], text))

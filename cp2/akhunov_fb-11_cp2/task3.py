@@ -3,7 +3,7 @@ import csv
 
 
 # Алфавіт
-ALPHABET: str = 'абвгдежзийклмнопрстуфхцчшщыьэюя'
+ALPHABET: str = 'абвгдежзийклмнопрстуфхцчшщыъьэюя'
 
 
 # Ця функція зчитує текстовий файл та поверає string з текстом цього файлу
@@ -14,9 +14,23 @@ def file_read(path: str) -> str:
 
 
 # Ця функція створює ключ певної довжини
-def key_generate(key_len) -> str:
-    new_key = ''.join(choice(ALPHABET) for i in range(key_len))
-    return new_key
+def key_generate(key_len: int) -> str:
+    key = ''.join(choice(ALPHABET) for i in range(key_len))
+    return key
+
+
+def decryption(text: str, key: str) -> str:
+    global ALPHABET
+    key_index: int = 0
+    decrypted_text: str = ''
+    for char in text:
+        # print(ALPHABET.index(char))
+        # print(ALPHABET.index(key[key_index]))
+        decrypted_char_index = (ALPHABET.index(char) - ALPHABET.index(key[key_index])) % len(ALPHABET)
+        decrypted_char = ALPHABET[decrypted_char_index]
+        decrypted_text += decrypted_char
+        key_index = (key_index + 1) % len(key)
+    return decrypted_text
 
 
 # Ця функція рахує індекси відповідності
@@ -40,10 +54,21 @@ def create_csv_file(filename: str, affinity_dict: dict):
         writer = csv.writer(file)
         writer.writerow(["Довжина ключа", "Індекс"])
         for affinity in affinity_dict:
-            if affinity == 'Вхідний текст':
-                key_len = 'Вхідний текст'
-            else:
-                key_len = len(affinity)
+            key_len = len(affinity)
             affinity = affinity_dict[affinity]
-            affinity = affinity.replace('.', ',')
+            affinity = str(affinity).replace('.', ',')
             writer.writerow([key_len, affinity])
+
+
+def main():
+    text: str = file_read('cp2_var15.txt')
+    affinity_dict: dict = {}
+    for i in range(2, 51):
+        key = key_generate(i)
+        decrypted_text = decryption(text,key)
+        affinity_dict[key] = affinity_index(decrypted_text)
+    create_csv_file('Affinities_task3.csv', affinity_dict)
+
+
+if __name__ == "__main__":
+    main()
