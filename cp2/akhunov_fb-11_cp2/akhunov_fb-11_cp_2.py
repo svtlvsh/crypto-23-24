@@ -70,7 +70,6 @@ def main():
     for key in KEYS:
         encrypted_text = encryption(key, text)
         affinity_dict[key] = affinity_index(encrypted_text)
-    print(affinity_dict)
     create_csv_file('Affinities.csv', affinity_dict)
 
 
