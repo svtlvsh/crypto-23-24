@@ -6,6 +6,8 @@ def main():
     text_filter(unfiltered, filtered)
     for file in encoded.keys():
         encode(encoded.get(file), filtered, file)
+
+
 def text_filter(unfiltered_file, filtered_file):
     with open(unfiltered_file, 'r', encoding="utf8") as file:
         text = file.read().lower()
@@ -24,7 +26,8 @@ def encode(r, filtered_file, output_file):
     with open(filtered_file, 'r', encoding="utf8") as file:
         text = file.read()
     num = randint(0, len(text))
-    key = text[num:num+r]
+    key = text[0:r]
+    print(key)
     encoded_text = ""
     i = 0
     for symbol in text:
