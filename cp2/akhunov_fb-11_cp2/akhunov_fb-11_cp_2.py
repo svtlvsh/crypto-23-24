@@ -63,14 +63,15 @@ def create_csv_file(filename: str, affinity_dict: dict):
             else:
                 key_len = len(affinity)
             affinity = affinity_dict[affinity]
+            affinity = affinity.replace('.', ',')
             writer.writerow([key_len, affinity])
 
 
 def main():
     text: str = file_read('task1.txt')
     affinity_dict: dict = {}
-    affinity_dict['Вхідний текст'] = affinity_index(text)
     text: str = text_edit(text)
+    affinity_dict['Вхідний текст'] = affinity_index(text)
     for key in KEYS:
         encrypted_text = encryption(key, text)
         affinity_dict[key] = affinity_index(encrypted_text)
