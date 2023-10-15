@@ -104,25 +104,6 @@ def find_r(r):
     with open("variant_2.txt", 'r', encoding='utf-8') as file:
         text = file.read()
 
-    array = []
-    for i in range(0, len(text), r):
-        n_gram = text[i:i + r]
-        if len(n_gram) == r:
-            array.append(n_gram)
-
-    suma_r = 0
-    for i in range(0, len(array)):
-        suma_r += index_vidpovidnosti_help(array[i])
-    suma_r = suma_r / len(array)
-    return print(suma_r)
-
-#for i in range(2, 32):
-    #find_r(i)
-
-def find_r_alternative(r):
-    with open("variant_2.txt", 'r', encoding='utf-8') as file:
-        text = file.read()
-
     suma_r = 0
     for offset in range(0, r):
         array = "".join([text[i] for i in range(offset, len(text) - r + 1, r)])
@@ -131,5 +112,88 @@ def find_r_alternative(r):
     suma_r = suma_r / r
     return print(suma_r)
 
-for i in range(2, 31):
-    find_r_alternative(i)
+#for i in range(2, 31):
+    #find_r(i)
+
+def find_key(r, mova):
+    with open("variant_2.txt", 'r', encoding='utf-8') as file:
+        text = file.read()
+
+    result_array = []
+
+    for offset in range(0, r):
+        array = "".join([text[i] for i in range(offset, len(text) - r + 1, r)])
+
+        dictionary = {}
+        alphabet = 'абвгдежзийклмнопрстуфхцчшщъыьэюя'
+
+        for char in alphabet:
+            dictionary[char] = 0
+
+        for item in array:
+            if item in dictionary:
+                dictionary[item] += 1
+
+        max_value = max(dictionary.values())
+        keys_with_max_value = [key for key, value in dictionary.items() if value == max_value]
+        keys_with_max_value_12 = keys_with_max_value[0]
+
+        alphabet = "абвгдежзийклмнопрстуфхцчшщъыьэюя"
+        alphabet_to_numbers = list(range(33))
+
+        alphabet_to_numbers_dictionary = {}
+        for word, number in zip(alphabet, alphabet_to_numbers):
+            alphabet_to_numbers_dictionary[word] = number
+
+        if keys_with_max_value_12 in alphabet_to_numbers_dictionary:
+            keys_with_max_value_to_number = alphabet_to_numbers_dictionary[keys_with_max_value_12]
+
+        if mova in alphabet_to_numbers_dictionary:
+            mova_to_number = alphabet_to_numbers_dictionary[mova]
+
+        result = (keys_with_max_value_to_number - mova_to_number) % 32
+
+        number_to_leters_dictionary = {
+            0: 'а',
+            1: 'б',
+            2: 'в',
+            3: 'г',
+            4: 'д',
+            5: 'е',
+            6: 'ж',
+            7: 'з',
+            8: 'и',
+            9: 'й',
+            10: 'к',
+            11: 'л',
+            12: 'м',
+            13: 'н',
+            14: 'о',
+            15: 'п',
+            16: 'р',
+            17: 'с',
+            18: 'т',
+            19: 'у',
+            20: 'ф',
+            21: 'х',
+            22: 'ц',
+            23: 'ч',
+            24: 'ш',
+            25: 'щ',
+            26: 'ъ',
+            27: 'ы',
+            28: 'ь',
+            29: 'э',
+            30: 'ю',
+            31: 'я'
+        }
+
+        if result in number_to_leters_dictionary:
+            result_in_buckva = number_to_leters_dictionary[result]
+
+        result_array.append(result_in_buckva)
+
+    a = ''.join(result_array)
+    print(a)
+
+find_key(28, "о")
