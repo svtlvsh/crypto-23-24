@@ -73,13 +73,10 @@ def main():
     text: str = text_edit(text)
     affinity_dict['Вхідний текст'] = affinity_index(text)
     for key in KEYS:
-        encrypted_text = encryption(key, text)
-        affinity_dict[key] = affinity_index(encrypted_text)
-    create_csv_file('Affinities.csv', affinity_dict)
+        print(encryption(key, text))
+        # affinity_dict[key] = affinity_index(encrypted_text)
+    # create_csv_file('Affinities.csv', affinity_dict)
 
 
-# if __name__ == "__main__":
-#     main()
-text: str = file_read('task1.txt')
-text = text_edit(text)
-print(encryption(KEYS[0], text))
+if __name__ == "__main__":
+    main()
