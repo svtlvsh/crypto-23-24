@@ -61,7 +61,7 @@ russian_letter_frequencies = [
 ]
 
 
-"""
+
 i = 1
 while i < 51:
     temp_text = ""
@@ -71,7 +71,7 @@ while i < 51:
         j = j + i
     print(f"Індекс для ключа {i} - ", IndexVidpovidnosty(temp_text))
     i = i + 1
-"""
+
 
 #13!!!!
 file_contents = file_contents[:]
