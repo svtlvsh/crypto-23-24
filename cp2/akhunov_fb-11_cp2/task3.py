@@ -19,13 +19,12 @@ def key_generate(key_len: int) -> str:
     return key
 
 
+# Ця функція розшифровує текст
 def decryption(text: str, key: str) -> str:
     global ALPHABET
     key_index: int = 0
     decrypted_text: str = ''
     for char in text:
-        # print(ALPHABET.index(char))
-        # print(ALPHABET.index(key[key_index]))
         decrypted_char_index = (ALPHABET.index(char) - ALPHABET.index(key[key_index])) % len(ALPHABET)
         decrypted_char = ALPHABET[decrypted_char_index]
         decrypted_text += decrypted_char

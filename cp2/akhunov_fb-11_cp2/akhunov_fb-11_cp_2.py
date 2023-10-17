@@ -17,7 +17,6 @@ def file_read(path: str) -> str:
 # Ця функція отримує текст та повертає редагований текст для подальшого аналізу
 def text_edit(text: str) -> str:
     text = text.replace('ё', 'е')
-    text = text.replace('ъ', 'ь')
     text = text.lower()
     text = ''.join(char for char in text if char in ALPHABET)
     text = text.replace(' ', '')
@@ -45,7 +44,7 @@ def affinity_index(encrypted_text: str) -> float:
         if char in frequency:
             frequency[char] += 1
         else:
-            frequency[char] = 0
+            frequency[char] = 1
     for char in frequency:
         affinity += (frequency[char] * (frequency[char] - 1)) / \
                     (len(encrypted_text) * len(encrypted_text) - 1)
@@ -63,7 +62,7 @@ def create_csv_file(filename: str, affinity_dict: dict):
             else:
                 key_len = len(affinity)
             affinity = affinity_dict[affinity]
-            affinity = affinity.replace('.', ',')
+            affinity = str(affinity).replace('.', ',')
             writer.writerow([key_len, affinity])
 
 
@@ -73,9 +72,9 @@ def main():
     text: str = text_edit(text)
     affinity_dict['Вхідний текст'] = affinity_index(text)
     for key in KEYS:
-        print(encryption(key, text))
-        # affinity_dict[key] = affinity_index(encrypted_text)
-    # create_csv_file('Affinities.csv', affinity_dict)
+        encrypted_text = encryption(key, text)
+        affinity_dict[key] = affinity_index(encrypted_text)
+    create_csv_file('Affinities.csv', affinity_dict)
 
 
 if __name__ == "__main__":

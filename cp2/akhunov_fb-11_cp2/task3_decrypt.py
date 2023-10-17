@@ -10,7 +10,8 @@ def file_read(path: str) -> str:
     return text
 
 
-def read_csv(path: str):
+# Ця функція зчитує csv файл зі списком найчастіше вживаних літер та повертає ці літери
+def read_csv(path: str) -> str:
     data_dict = {}
     with open(path, newline='', encoding='utf-8') as file:
         reader = csv.reader(file)
@@ -27,13 +28,12 @@ def read_csv(path: str):
     return key_string
 
 
+# Ця функція розшифровує текст
 def decryption(text: str, key: str) -> str:
     global ALPHABET
     key_index: int = 0
     decrypted_text: str = ''
     for char in text:
-        # print(ALPHABET.index(char))
-        # print(ALPHABET.index(key[key_index]))
         decrypted_char_index = (ALPHABET.index(char) - ALPHABET.index(key[key_index])) % len(ALPHABET)
         decrypted_char = ALPHABET[decrypted_char_index]
         decrypted_text += decrypted_char
@@ -45,6 +45,7 @@ most_common_chars = read_csv('Mono_no_space.csv')
 # print(most_common_chars)
 
 
+# Ця функція генерує потенційний ключ ШТ
 def key_finder(key_len: int, guess_chars: str, text: str):
     key: str = ''
     for i in range(key_len):
