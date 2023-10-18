@@ -112,8 +112,12 @@ def find_r(r):
     suma_r = suma_r / r
     return print(suma_r)
 
-#for i in range(2, 31):
-    #find_r(i)
+def print_result():
+    for i in range(2, 31):
+        print(f"Lenkey: {i}")
+        find_r(i)
+
+#print_result()
 
 def find_key(r, mova):
     with open("variant_2.txt", 'r', encoding='utf-8') as file:
@@ -196,4 +200,4 @@ def find_key(r, mova):
     a = ''.join(result_array)
     print(a)
 
-find_key(28, "о")
+#find_key(28, "о")
