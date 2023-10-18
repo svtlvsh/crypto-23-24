@@ -1,5 +1,3 @@
-from random import randint
-dictionary = {'с': 30846, 'т': 38288, 'а': 47086, 'р': 22374, 'и': 36418, 'к': 21475, 'ы': 11036, 'б': 10721, 'ч': 9433, 'л': 27765, 'о': 68455, 'д': 17799, 'н': 38806, 'в': 24317, 'е': 50576, 'й': 5470, 'г': 10004, 'ь': 12963, 'ф': 900, 'м': 19223, 'у': 17107, 'ж': 6505, 'я': 12442, 'х': 4969, 'п': 15871, 'з': 10255, 'ш': 4613, 'ю': 2926, 'щ': 1963, 'ц': 1362, 'э': 2002, 'ъ': 120}
 def main():
     unfiltered = "unfiltered.txt"
     filtered = "filtered.txt"
@@ -8,7 +6,7 @@ def main():
     for file in encoded.keys():
         encode(encoded[file], filtered, file)
         print(f"{file} ---> {reliability_index(file)}")
-    print(f"{file} ---> {reliability_index(filtered)}")
+    print(f"{filtered} ---> {reliability_index(filtered)}")
     length_and_text = find_key_length(17, "wtf.txt")
     key = decode_of_key(length_and_text[0], length_and_text[1])
     print(key)
@@ -33,7 +31,6 @@ def text_filter(unfiltered_file, filtered_file):
 def encode(r, filtered_file, output_file):
     with open(filtered_file, 'r', encoding="utf8") as file:
         text = file.read()
-    num = randint(0, len(text))
     key = text[0:r]
     encoded_text = ""
     i = 0
@@ -42,6 +39,7 @@ def encode(r, filtered_file, output_file):
         i += 1
     with open(output_file, 'w', encoding="utf-8") as file:
         file.write(encoded_text)
+
 def letter_count(text:str):
     dictionary = {"total" : 0}
     for symbol in text:
@@ -51,6 +49,7 @@ def letter_count(text:str):
         else:
             dictionary[symbol] += 1
     return dictionary
+
 def reliability_index(filtered_file):
     with open(filtered_file, 'r', encoding="utf-8") as file:
         text = file.read()
@@ -72,6 +71,7 @@ def reliability_index_text(text):
             index += dictionary[key]*(dictionary[key]-1)
     result = index/(length*(length-1))
     return result
+
 def find_key_length(r, encoded_file):
     with open(encoded_file, 'r', encoding="utf-8") as file:
         text = file.read()
@@ -101,7 +101,7 @@ def decode_of_key(text, key_length):
             y = most_common_char(part_text)
             x = 'о'
             key += chr(((ord(y) - ord(x)) % 32) + 1072)
-        i+=1
+        i += 1
     return key
 
 def decode_text(key, encoded_file):
