@@ -5,7 +5,7 @@ from save import *
 
 PLAINTEXT_FILE = 'text'
 CIPHERTEXT_FILE = 'ct'
-REQ_LEN = 10
+REQ_LEN = 3
 KEY_LEN = [2,3,4,5]+[i for i in range(10,21,1)]
 e_,a_,q_ = "[!]","[*]","[?]"
 RUS_ALPHABET = 'абвгдежзийклмнопрстуфхцчшщъыьэюя'
