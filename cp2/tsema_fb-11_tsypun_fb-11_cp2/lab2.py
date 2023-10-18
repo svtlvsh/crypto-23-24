@@ -3,21 +3,30 @@
 
 alpha = "абвгдежзийклмнопрстуфхцчшщъыьэюя"
 
+ind0 = 1/len(alpha)
 
-def c_count(text: str, n: int, ngr_intercept=False) -> dict[str, float]:
-    step = 1 if ngr_intercept else n
-    c_dict = {}
-    
-    for i in range(0, len(text) - n, step):
-        if not text[i: i + n]:
-            continue
 
-        if text[i: i + n] not in c_dict.keys():
-            c_dict.update({text[i: i + n]: 1})
-        else:
-            c_dict[text[i: i + n]] += 1
+def get_lang_p():
+    res = {}
+    with open("lab1_stats/lab1_monogram_in_text_without_spaces.csv", "r") as freq:
+        while l := freq.readline():
+            res.update({l.split(",")[0]: float(l.split(",")[1][:-1])})
 
-    return c_dict
+    return res
+
+
+def ind_of_c_theor():
+    result = 0
+
+    with open("lab1_stats/lab1_monogram_in_text_without_spaces.csv", "r") as freq:
+        while l := freq.readline():
+            result += float(l.split(",")[1][:-1]) ** 2 
+
+    return result
+
+
+alpha_sorted_by_freq = "".join(tuple(dict(sorted(dict(get_lang_p()).items(), key=lambda x: x[1], reverse=True)).keys()))
+ind_theor = ind_of_c_theor()
 
 
 def text_purification(fLine: str, isnlp=False, save_space=False) -> (bool, str):
@@ -55,6 +64,33 @@ def text_purification(fLine: str, isnlp=False, save_space=False) -> (bool, str):
         isBegining = False
 
     return isNewLineCPresent, output
+
+
+def g(path: str):
+    with open(path, "r", encoding="utf-8") as f:
+        while (l := f.readline()):
+            yield l
+
+
+def kron_delta(text: str):
+    t_len = len(text)
+
+    for r in range(1, 100):
+        Dr = 0
+        for i in range(1, t_len - r):
+            Dr += int(text[i] == text[i + r])
+
+        if Dr > 250: 
+            print(Dr, r)
+
+
+def c_count(text: str) -> dict[str, int]:
+    res = {k: 0 for k in alpha}
+
+    for c in alpha:
+        res[c] = text.count(c)
+
+    return res
     
 
 def vigenere(key: str, text: str, decrypt=False) -> str:
@@ -75,28 +111,82 @@ def ind_of_coincidence(c_dict: dict, text_len: int):
         result += c * (c - 1)
 
     return result / (text_len * (text_len - 1))
+    
+
+def get_key(freq_chars_per_block: str, n: int):
+    key = ""
+    for c in freq_chars_per_block:
+        key += alpha[(alpha.index(c) - alpha.index(alpha_sorted_by_freq[n])) % len(alpha)]
+
+    return key
 
 
-def g():
-    with open("text_to_encrypt.txt", "r", encoding="utf-8") as f:
-        while (l := f.readline()):
-            yield l
+def decrypter(text: str, delta: float, r_max: int):
+    blocks = {}
+    
+    for r in range(2, r_max):
+        avg_ind = 0
+        coinc_per_block = {}
+
+        for i in range(0, r):
+            block_len = len(text[i::r])
+
+            if block_len == 1:
+                continue
+
+            inblock_coinc = c_count(text[i::r])
+            avg_ind += ind_of_coincidence(inblock_coinc, block_len)
+
+            coinc_per_block.update({i: inblock_coinc})
+
+        if abs(avg_ind/r - ind_theor) < delta:
+            blocks.update({r: coinc_per_block})
+            print(avg_ind/r, r)
+
+    key_len = list(blocks.keys())[0]
+
+    c_blocks = dict(blocks[key_len])
+    
+    freq_chars_per_block = ""
+    for i in range(0, key_len):
+        c_block = tuple(dict(sorted(dict(c_blocks[i]).items(), key=lambda x: x[1], reverse=True)).keys())
+        freq_chars_per_block += c_block[0]
+
+    return freq_chars_per_block
 
 
 if __name__ == "__main__":
+    # isnlp = False
+    # p_text = ""
+    # for l in g("text_to_encrypt.txt"):
+    #     isnlp, pt = text_purification(l, isnlp)
+    #     p_text += pt
+
+    # ind = ind_of_coincidence(c_count(p_text), len(p_text))
+    # print(f"\n\nI: {ind}\n\nO: {p_text}")
+
+    # keys = ("бе", "чай", "пиво", "кефир", "пиццасананасами")
+
+    # for k in keys:
+    #     ct = vigenere(k, p_text)
+    #     ind = ind_of_coincidence(c_count(ct), len(ct))
+    #     print(f"\n\nKey length: {len(k)}\nI: {ind}\nC: {ct}")
+
+
+    text = ""
     isnlp = False
-    p_text = ""
-    for l in g():
+    for l in g("text_to_decrypt.txt"):
         isnlp, pt = text_purification(l, isnlp)
-        p_text += pt
+        text += pt 
 
-    ind = ind_of_coincidence(c_count(p_text, 1), len(p_text))
-    print(f"\n\nI: {ind}\n\nO: {p_text}")
+    fcpb = decrypter(text, 0.01, 100)
 
-    keys = ("бе", "чай", "пиво", "кефир", "пиццасананасами")
+    # k="турелииоборойдей"
+    # print()
+    # print(k)
+    # print(vigenere(k, text[0:16*2], True))
+    for i in range(len(alpha_sorted_by_freq)):
+        pkey = get_key(fcpb, i)
+        print(f"\n{'Key:':<20}{pkey}\n{'CT fragment:':<20}{text[0:len(pkey)*2]}\n{'Vigenere result:':<20}{vigenere(pkey, text[0:len(pkey)*2], True)}\n")
 
-    for k in keys:
-        ct = vigenere(k, p_text)
-        ind = ind_of_coincidence(c_count(ct, 1), len(ct))
-        print(f"\n\nKey length: {len(k)}\n\nI: {ind}\n\nC: {ct}")
     
