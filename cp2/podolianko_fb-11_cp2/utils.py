@@ -1,6 +1,9 @@
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Iterable
 from numbers import Number
 import re
+
+import matplotlib.pyplot
+
 from consts import *
 
 # TODO move this somewhere
@@ -69,7 +72,7 @@ def naive_first_peak(data: Dict[Number, Number]) -> Tuple[Number, Number]:
     return m
 
 
-def guess_key_len_1(text: str, ioc_random: float, ioc_theoretical: float, max_considered_len=30) -> int:
+def guess_key_len_1(text: str, ioc_random: float, ioc_theoretical: float, max_considered_len=30, diagram=False) -> int:
     block_iocs_avg: Dict[int, float] = dict()
     for r in range(2, max_considered_len):
         blocks = split_as_caesar_blocks(text, r)
@@ -82,19 +85,30 @@ def guess_key_len_1(text: str, ioc_random: float, ioc_theoretical: float, max_co
     logging.log(logging.INFO, f'Average block iocs for different r\'s: %s', block_iocs_avg)
     logging.log(logging.INFO, f'Max ioc: {max(block_iocs_avg.items(), key=lambda x: x[1])}')
 
-    # experimental
-    # import matplotlib.pyplot as plt
-    # plot
-    # fig, ax = plt.subplots()
-    # ax.scatter(block_iocs_avg.keys(), block_iocs_avg.values())
-    # ax.set(ylim=(0, 0.7))
-    # plt.show()
+    # plotting
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots()
+    ax.set_title('Усереднені і.в. блоків для різних r')
+    ax.scatter(block_iocs_avg.keys(), block_iocs_avg.values())
+    ax.set(ylim=(IOC_RANDOM, 0.06))
+    ax.set_xlabel('r')
+    ax.set_ylabel('і.в.')
+    ax.minorticks_on()
+    plt.savefig('./data/avg_iocs.png')
 
     return naive_first_peak(data=block_iocs_avg)[0]
 
 
 def letter_freq(text: str) -> List[Tuple[str, float]]:
     return [(letter, text.count(letter) / len(text)) for letter in set(text)]
+
+def md_table_rows(rows) -> str:
+    return '\n'.join(['|' + '|'.join(map(str, row)) + '|' for row in rows])
+
+def md_table_columns(columns: Tuple[List, List], formats: List[str] | Tuple = '%s') -> str:
+    columns = [[format(columns[i][row], formats[i]) for row in range(len(columns[i]))] for i in range(len(columns))]
+
+    return '\n'.join(['|' + '|'.join(row) + '|' for row in zip(*columns)])
 
 
 if __name__ == '__main__':
@@ -107,6 +121,7 @@ if __name__ == '__main__':
             with open(sys.argv[2], 'xt', encoding='utf-8') as file:
                 file.write(normalize_string(text, ALPHABET, TRANSLATOR))
         except FileExistsError:
+            print('Overwriting existing file')
             with open(sys.argv[2], 'wt', encoding='utf-8') as file:
                 file.write(normalize_string(text, ALPHABET, TRANSLATOR))
     else:
