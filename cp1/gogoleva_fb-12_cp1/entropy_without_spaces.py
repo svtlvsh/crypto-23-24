@@ -1,7 +1,7 @@
 import re
 import math
 
-file_path = r"C:\Users\Polya\Desktop\KPI\crypto-23-24-main\tasks\cp1\solution\bible.txt"
+file_path = r"C:\Users\Polya\Desktop\KPI\crypto\crypto-23-24\cp1\gogoleva_fb-12_cp1\bible.txt"
 
 with open(file_path, "r") as file:
     cleaned_text = ''
@@ -58,7 +58,7 @@ total_bigrams_with_overlap = len(cleaned_text) - 1
 
 for count in sorted_bigram_with_overlap_counts.values():
     probability = count / total_bigrams_with_overlap
-    entropy_bigram_with_overlap -= probability * math.log2(probability)
+    entropy_bigram_with_overlap -= (probability * math.log2(probability))/2
 
 print("H2 з перетином у тексті без пробілів:", entropy_bigram_with_overlap)
 
@@ -68,13 +68,13 @@ total_bigrams_without_overlap = len(cleaned_text) // 2
 
 for count in sorted_bigram_without_overlap_counts.values():
     probability = count / total_bigrams_without_overlap
-    entropy_bigram_without_overlap -= probability * math.log2(probability)
+    entropy_bigram_without_overlap -= (probability * math.log2(probability))/2
 
 print("H2 без перетину у тексті без пробілів:", entropy_bigram_without_overlap)
 
-r_for_monograms = 1 - (entropy_letter/math.log2(total_letters))
-r_for_bigram_with_overlap = 1 - (entropy_bigram_with_overlap/math.log2(total_bigrams_with_overlap))
-r_for_bigram_without_overlap = 1 - (entropy_bigram_without_overlap/math.log2(total_bigrams_without_overlap))
+r_for_monograms = 1 - (entropy_letter/math.log2(33))
+r_for_bigram_with_overlap = 1 - (entropy_bigram_with_overlap/math.log2(33))
+r_for_bigram_without_overlap = 1 - (entropy_bigram_without_overlap/math.log2(33))
 
 print("Надлишковість для монограм:",r_for_monograms)
 print("Надлишковість для біграм з перетином:",r_for_bigram_with_overlap)
