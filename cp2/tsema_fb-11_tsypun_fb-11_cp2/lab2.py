@@ -80,7 +80,7 @@ def kron_delta(text: str, thr: int) -> None:
             Dr += int(text[i] == text[i + r])
 
         if Dr > thr: 
-            print(Dr, r)
+            print(f"{Dr:<6}|{r}")
 
 
 def c_count(text: str) -> dict[str, int]:
@@ -122,7 +122,8 @@ def get_key(freq_chars_per_block: str, n: int) -> str:
 
 def decrypter(text: str, delta: float, r_max: int) -> str:
     blocks = {}
-    
+
+    print(f"\nClosest to ind_of_c_theor indices of coincidence:\n\n{'Index':^22}|Key length") 
     for r in range(2, r_max):
         avg_ind = 0
         coinc_per_block = {}
@@ -140,7 +141,7 @@ def decrypter(text: str, delta: float, r_max: int) -> str:
 
         if abs(avg_ind/r - ind_theor) < delta:
             blocks.update({r: coinc_per_block})
-            print(avg_ind/r, r)
+            print(f"{avg_ind/r:<22}|{r:^10}")
 
     key_len = list(blocks.keys())[0]
 
@@ -177,13 +178,13 @@ if __name__ == "__main__":
         isnlp, pt = text_purification(l, isnlp)
         text += pt 
 
+    print(f"\nKronecker symbol results:\n\n{'Delta':^6}|Key length")
+    kron_delta(text, 250)
     fcpb = decrypter(text, 0.01, 100)
 
     for i in range(len(alpha_sorted_by_freq)):
         pkey = get_key(fcpb, i)
         print(f"\n{'Key:':<20}{pkey}\n{'CT fragment:':<20}{text[0:len(pkey)*2]}\n{'Vigenere result:':<20}{vigenere(pkey, text[0:len(pkey)*2], True)}\n")
-
-    print(type(line_gen("text_to_decrypt.txt")))
     
     while True:
         k = input("Enter possible key: ")
