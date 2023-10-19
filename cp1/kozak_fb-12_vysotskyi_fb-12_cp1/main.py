@@ -146,3 +146,11 @@ if __name__ == "__main__":
         text += f"{entropy} {redundancy}\n"
         print(entropy, redundancy)
     save_text("data.csv", text)
+
+    print("Redundancies from CoolPinkProgram")
+    print(round(calculate_redundancy(2.44563, 32), 5))
+    print(round(calculate_redundancy(3.17705, 32), 5))
+    print(round(calculate_redundancy(1.38487, 32), 5))
+    print(round(calculate_redundancy(2.05225, 32), 5))
+    print(round(calculate_redundancy(1.29114, 32), 5))
+    print(round(calculate_redundancy(2.04913, 32), 5))
