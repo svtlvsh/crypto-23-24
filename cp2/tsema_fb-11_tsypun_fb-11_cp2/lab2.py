@@ -5,8 +5,7 @@ alpha = "абвгдежзийклмнопрстуфхцчшщъыьэюя"
 
 ind0 = 1/len(alpha)
 
-
-def get_lang_p():
+def get_lang_p() -> dict:
     res = {}
     with open("lab1_stats/lab1_monogram_in_text_without_spaces.csv", "r") as freq:
         while l := freq.readline():
@@ -15,7 +14,7 @@ def get_lang_p():
     return res
 
 
-def ind_of_c_theor():
+def ind_of_c_theor() -> float:
     result = 0
 
     with open("lab1_stats/lab1_monogram_in_text_without_spaces.csv", "r") as freq:
@@ -66,13 +65,13 @@ def text_purification(fLine: str, isnlp=False, save_space=False) -> (bool, str):
     return isNewLineCPresent, output
 
 
-def g(path: str):
+def line_gen(path: str):
     with open(path, "r", encoding="utf-8") as f:
         while (l := f.readline()):
             yield l
 
 
-def kron_delta(text: str):
+def kron_delta(text: str, thr: int) -> None:
     t_len = len(text)
 
     for r in range(1, 100):
@@ -80,7 +79,7 @@ def kron_delta(text: str):
         for i in range(1, t_len - r):
             Dr += int(text[i] == text[i + r])
 
-        if Dr > 250: 
+        if Dr > thr: 
             print(Dr, r)
 
 
@@ -105,7 +104,7 @@ def vigenere(key: str, text: str, decrypt=False) -> str:
     return result
 
 
-def ind_of_coincidence(c_dict: dict, text_len: int):
+def ind_of_coincidence(c_dict: dict, text_len: int) -> float:
     result = 0
     for c in c_dict.values():
         result += c * (c - 1)
@@ -113,7 +112,7 @@ def ind_of_coincidence(c_dict: dict, text_len: int):
     return result / (text_len * (text_len - 1))
     
 
-def get_key(freq_chars_per_block: str, n: int):
+def get_key(freq_chars_per_block: str, n: int) -> str:
     key = ""
     for c in freq_chars_per_block:
         key += alpha[(alpha.index(c) - alpha.index(alpha_sorted_by_freq[n])) % len(alpha)]
@@ -121,7 +120,7 @@ def get_key(freq_chars_per_block: str, n: int):
     return key
 
 
-def decrypter(text: str, delta: float, r_max: int):
+def decrypter(text: str, delta: float, r_max: int) -> str:
     blocks = {}
     
     for r in range(2, r_max):
@@ -156,37 +155,40 @@ def decrypter(text: str, delta: float, r_max: int):
 
 
 if __name__ == "__main__":
-    # isnlp = False
-    # p_text = ""
-    # for l in g("text_to_encrypt.txt"):
-    #     isnlp, pt = text_purification(l, isnlp)
-    #     p_text += pt
+    isnlp = False
+    p_text = ""
+    for l in line_gen("text_to_encrypt.txt"):
+        isnlp, pt = text_purification(l, isnlp)
+        p_text += pt
 
-    # ind = ind_of_coincidence(c_count(p_text), len(p_text))
-    # print(f"\n\nI: {ind}\n\nO: {p_text}")
+    ind = ind_of_coincidence(c_count(p_text), len(p_text))
+    print(f"\n\nI: {ind}\n\nO: {p_text}")
 
-    # keys = ("бе", "чай", "пиво", "кефир", "пиццасананасами")
+    keys = ("бе", "чай", "пиво", "кефир", "пиццасананасами")
 
-    # for k in keys:
-    #     ct = vigenere(k, p_text)
-    #     ind = ind_of_coincidence(c_count(ct), len(ct))
-    #     print(f"\n\nKey length: {len(k)}\nI: {ind}\nC: {ct}")
-
+    for k in keys:
+        ct = vigenere(k, p_text)
+        ind = ind_of_coincidence(c_count(ct), len(ct))
+        print(f"\n\n{'Key length:':<15}{len(k)}\n{'Index:':<15}{ind}\n{'Key:':<15}{k}\n{'CT Fragment:':<15}{ct[:100]}")
 
     text = ""
     isnlp = False
-    for l in g("text_to_decrypt.txt"):
+    for l in line_gen("text_to_decrypt.txt"):
         isnlp, pt = text_purification(l, isnlp)
         text += pt 
 
     fcpb = decrypter(text, 0.01, 100)
 
-    # k="турелииоборойдей"
-    # print()
-    # print(k)
-    # print(vigenere(k, text[0:16*2], True))
     for i in range(len(alpha_sorted_by_freq)):
         pkey = get_key(fcpb, i)
         print(f"\n{'Key:':<20}{pkey}\n{'CT fragment:':<20}{text[0:len(pkey)*2]}\n{'Vigenere result:':<20}{vigenere(pkey, text[0:len(pkey)*2], True)}\n")
 
+    print(type(line_gen("text_to_decrypt.txt")))
     
+    while True:
+        k = input("Enter possible key: ")
+        print(f"\n{'Key:':<20}{k}\n{'CT fragment:':<20}{text[0:len(k)*2]}\n{'Vigenere result:':<20}{vigenere(k, text[0:len(k)*2], True)}\n")
+
+        yo = input("Was the key correct? (y/n): ")
+        if yo in ("y", "Y"):
+            break
