@@ -78,15 +78,15 @@ def save_vidpovidnist(encrypted_text):
     df_key_length.to_excel("key_lengths.xlsx", index=False)
     print("Індекси відповідності збережені до файлу 'key_length.xlsx'")
 
-    real_key_length = int(input("Введіть довжину ключа: "))
-    return real_key_length
+    key_length = int(input("Введіть довжину ключа: "))
+    return key_length
 
 def find_key(text, key_length):
     frequent_letters = 'оеиантслвр'
     possible_keys = generate_possible_keys(text, key_length)
 
     for frequent_letter in frequent_letters:
-        print(f"Possible Key: {possible_keys[frequent_letter]}")
+        print(f"Можливий ключ: {possible_keys[frequent_letter]}")
 
     real_key = input("Введіть ключ: ")
     return real_key
