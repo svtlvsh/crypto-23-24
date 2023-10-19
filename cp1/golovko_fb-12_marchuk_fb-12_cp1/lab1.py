@@ -18,12 +18,12 @@ def entropy(original_text,letter_freq):
 def entropy_bigram_with_overlap(bigram_amount,letter_freq):
     entropy=float(0)
     for chastota in letter_freq.values():
-        entropy+=(chastota/(len(bigram_amount)-1))*math.log2(chastota/(len(bigram_amount)-1))
+        entropy+=(chastota/(len(bigram_amount)-1))*math.log2(chastota/(len(bigram_amount)-1))*0.5
     return -entropy
 def entropy_bigram_without_overlap(bigram_amount,letter_freq):
     entropy=float(0)
     for chastota in letter_freq.values():
-        entropy+=(chastota/(len(bigram_amount)/2))*math.log2(chastota/(len(bigram_amount)/2))
+        entropy+=(chastota/(len(bigram_amount)/2))*math.log2(chastota/(len(bigram_amount)/2))*0.5
     return -entropy
 def find_freq(formated_text):
     letter_frequency = {}
@@ -66,13 +66,11 @@ def print_freq(let_freq,formated_text):
     for letter, frequency in sorted(let_freq.items(), key=lambda x:x[1], reverse=True):
         print(f"{letter}: {frequency},    %= {round(int(frequency)/len(formated_text)*100,3)}")
     return None
-def nadlishkovist_monogram(entropy,original_text):
-    return 1-(entropy/math.log2(len(original_text)))
+def nadlishkovist_without_spaces(entropy):
+    return 1-(entropy/math.log2(int(33)))
 
-def nadlishkovist_bigram_with_overlap(entropy,original_text):
-    return 1-(entropy/math.log2(len(original_text)-1))
-def nadlishkovist_bigram_without_overlap(entropy,original_text):
-    return 1-(entropy/math.log2(len(original_text)/2))
+def nadlishkovist_with_spaces(entropy):
+    return 1-(entropy/math.log2(int(34)))
 
 input_file_path = 'D:\\uni year 3\\crypto labs\\tasks\\cp1\\test.txt'
 with open(input_file_path, 'r', encoding='utf-8') as file:
@@ -110,23 +108,26 @@ entropy_with_spaces_bigram=entropy_bigram_with_overlap(output_with_spaces,output
 entropy_without_spaces_bigram_without_overlap=entropy_bigram_without_overlap(output_without_spaces,output_without_spaces_bi_freq_without_overlap)
 entropy_with_spaces_bigram_without_overlap=entropy_bigram_without_overlap(output_with_spaces,output_with_spaces_bi_freq_without_overlap)
 print("entropy with spaces",entropy_with_spaces)
-print("R=",nadlishkovist_monogram(entropy_with_spaces,output_with_spaces))
+print("R=",nadlishkovist_with_spaces(entropy_with_spaces))
 print("******")
 print("entropy without spaces",entropy_without_spaces)
-print("R=",nadlishkovist_monogram(entropy_without_spaces,output_without_spaces))
+print("R=",nadlishkovist_without_spaces(entropy_without_spaces))
 print("******")
 print("entropy without spaces bigram",entropy_without_spaces_bigram)
-print("R=",nadlishkovist_bigram_with_overlap(entropy_without_spaces_bigram,output_without_spaces))
+print("R=",nadlishkovist_without_spaces(entropy_without_spaces_bigram))
 print("******")
 print("entropy with spaces bigram",entropy_with_spaces_bigram)
-print("R=",nadlishkovist_bigram_with_overlap(entropy_with_spaces_bigram,output_with_spaces))
+print("R=",nadlishkovist_with_spaces(entropy_with_spaces_bigram))
 print("******")
 print("entropy without spaces bigram without overlap",entropy_without_spaces_bigram_without_overlap)
-print("R=",nadlishkovist_bigram_without_overlap(entropy_without_spaces_bigram_without_overlap,output_without_spaces))
+print("R=",nadlishkovist_without_spaces(entropy_without_spaces_bigram_without_overlap))
 print("******")
 print("entropy with spaces bigram without overlap",entropy_with_spaces_bigram_without_overlap)
-print("R=",nadlishkovist_bigram_without_overlap(entropy_with_spaces_bigram_without_overlap,output_with_spaces))
-
+print("R=",nadlishkovist_with_spaces(entropy_with_spaces_bigram_without_overlap))
+print("COOL PINK PROGRAM R")
+print("H(10)",nadlishkovist_with_spaces(float(2.58759931788218)), "> R >",nadlishkovist_with_spaces(float(3.17669456263237)))
+print("H(20)",nadlishkovist_with_spaces(float(1.51567813452112)), "> R >",nadlishkovist_with_spaces(float(2.29225447733486)))
+print("H(30)",nadlishkovist_with_spaces(float(1.13902801008919)), "> R >",nadlishkovist_with_spaces(float(1.70396957073853)))
 output_without_spaces_path = 'D:\\uni year 3\\crypto labs\\tasks\\cp1\\output without spaces.txt'
 with open(output_without_spaces_path, 'w', encoding='utf-8') as file:
     file.write(output_without_spaces)
