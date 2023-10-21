@@ -58,7 +58,8 @@ def entropy(freq):
     sum = 0
     for prob in freq.values():
         sum -= prob * math.log2(prob)
-    return sum
+
+    return sum / len(list(freq.keys())[0])
 
 
 def write_to_file(unpacked, name):
