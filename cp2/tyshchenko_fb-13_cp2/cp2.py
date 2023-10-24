@@ -84,11 +84,12 @@ def text_is_valid(text: str) -> bool:
             return False
     return True
     
-def key_is_valid(text: str, key: str, ind: int) -> bool:
+def key_is_valid(text: str, key: str, ind: int, show=False) -> bool:
     ot = decrypt(text, key)
     for i in range(ind, len(ot), len(key)):
         if ot[i:i+2] not in BIGRAMS:
-            print(f"Key {key} ({key[ind:ind+2]}) is invalid ({ot[i:i+2]} at {i})\n{ot[i:i+30]}")
+            if show:
+                print(f"Key {key} ({key[ind:ind+2]}) is invalid ({ot[i:i+2]} at {i})\n{ot[i:i+30]}")
             return False
     return True    
     
@@ -102,20 +103,36 @@ def find_key(text: str, period: int):
         letters = dict(sorted(count_letters(b).items(), reverse=True, key=lambda item: item[1]))
         common.append(encode(list(letters)[0]))
     # Create list of the most common russian letter.
-    s = [encode(list(FREQS)[0])] * period
+    s = [encode(x) for x in "н"*period]
     # Create key based on the most common letters of russian and CT.
     base_key = [decode(y-x) for x, y in zip(common, s)]
     # Find the first two letters of a key that may be correct. 
-    for i in ALPHABET:
-        base_key[0] = i
-        for j in ALPHABET:
-            base_key[1] = j
-            key = ''.join(base_key)
-            if text_is_valid(key[:2]):
-                print(f"Possible key: {key}")
-                if key_is_valid(text, key, 0):
-                    print(f"{key} is correct")
-                    visualize(text[:90], key, 'd')
+    #pt[0] is in ["о", "и"]
+    #pt[1] is in ["о", "е", "а", "и"]
+    '''
+    # Finding first 4 letters.
+    ind = 0
+    for i in ["и", "л", "р", "к"]:
+        s[ind] = encode(i)
+        for j in list(FREQS)[:10]:
+            s[ind+1] = encode(j)
+            for k in list(FREQS)[:15]:
+                s[ind+2] = encode(k)
+                for l in list(FREQS)[:10]:
+                    s[ind+3] = encode(l)
+                    base_key = [decode(y-x) for x, y in zip(common, s)]
+                    key = ''.join(base_key)
+                    if (text_is_valid(key[ind:ind+2]) and
+                        text_is_valid(key[ind+1:ind+3]) and
+                        text_is_valid(key[ind+2:ind+4])):
+                        #print(f"Possible key: {key}")
+                        #if key_is_valid(text[:30], key, ind):
+                        pt = ''.join([decode(x) for x in s])
+                        print(f"Key: {key}\tPT = {pt}")
+                        #visualize(text[:30], key, 'd')
+    '''
+    print(f"key: {''.join(base_key)}\tPT: {''.join([decode(x) for x in s])}")
+    visualize(text[:30], ''.join(base_key), 'd')
     
 # Swap letters with their corresponding numbers.
 def encode(text: str):
@@ -187,7 +204,10 @@ if __name__ == "__main__":
         f = sys.argv[1]
         # Read and format russian text.
         text = format_text(read_file(f))
-        
+        #text = "добрыйдень"
+        #visualize(text, "месть", 'e')
+        #CT = encrypt(text, "месть")
+        #visualize(CT, "месть", 'd')
         # Task 1. Encrypt custom text with different keys.
         '''
         print(find_period(text))
@@ -196,10 +216,10 @@ if __name__ == "__main__":
             visualize(text, r)
         '''
         # Task 2. Find key length.
-        period = find_period(text)
+        #period = find_period(text)
         #print(f"Key length is {period}")
         # Task 3. Find key.
-        find_key(text, period)
+        #find_key(text, period)
         #visualize(text[:90], "гтттакоучтмныш", 'd')
         #visualize(text[:30], "гууужьчтоущшуу", 'd')
         #visualize(text[:30], "энннахсминутнн", 'd')
