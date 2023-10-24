@@ -5,7 +5,7 @@ from string import ascii_lowercase
 from orig import lorem
 
 
-def index_of_coincidence(text, alphabet):
+def index_of_coincidence(text: str, alphabet: str) -> float:
   length = len(text)
   ioc = 0
   for i in alphabet:
@@ -14,7 +14,7 @@ def index_of_coincidence(text, alphabet):
   return ioc
 
 
-def vigenere(text, key):
+def vigenere(text: str, key: str) -> str:
   print('-'*50)
   print(f'KEY: {key}')
   enc = []

@@ -23,6 +23,7 @@ def find_key_len(theory_index: float=0.0553) -> int:
   res_i = None
   for i in range(1, 30):
     ioc = block_index_of_coincidence(enc, theory_freq, i)
+    print(f'[*] Index of coincidence {ioc} of key length {i}')
     if abs(theory_index - ioc) < 0.01:
       res_i = i
       break
@@ -59,7 +60,6 @@ def dec(enc: str, alph: str='абвгдежзийклмнопрстуфхцчш�
   key[-2] = 'к'
   key[1] = 'к'
   key = ''.join(key)
-
   cleartext = ''
   for i, c in enumerate(enc):
     cleartext += alph[ord(c) - ord(key[i%len(key)])]
@@ -68,7 +68,9 @@ def dec(enc: str, alph: str='абвгдежзийклмнопрстуфхцчш�
 
 
 def main():
+
   text = dec(enc)
+  print(f'[*] Ciphered text: {enc}')
   print(f'[*] Found key: {text[1]}')
   print(f'[*] Deciphered text: {text[0]}')
 
