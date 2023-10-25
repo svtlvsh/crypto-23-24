@@ -177,21 +177,21 @@ with open("/home/kali/Desktop/cryptolab2/encoded_text.txt", "r") as file_input_e
     # for i in range(2, 31):
     #     print(f"Index of key size {i}:", index_count_blocks(split_text(encoded_text, i), i))            #now we know that the key length is 15 letters
     
-    #keys = split_text(encoded_text, 15)
+    keys = split_text(encoded_text, 15)
 
 
     #selects most frequent letter from each block
-    #key_str = ""
-    #for i in range(0, 15):
-        #key_str += most_freq(keys[i])
+    key_str = ""
+    for i in range(0, 15):
+        key_str += most_freq(keys[i])
 
     # print(decoder(key_str, 15))
 
     #decoded key
-    # decoded_key = decoder(key_str, 15)
+    decoded_key = decoder(key_str, 15)
     # print(full_decoder(encoded_text, decoded_key))
 
     #final key
-    #final_key = "арудазовархимаг"
+    final_key = "арудазовархимаг"
     # print(decoded_key)
-    #print(full_decoder(encoded_text, final_key))
+    print(full_decoder(encoded_text, final_key))
