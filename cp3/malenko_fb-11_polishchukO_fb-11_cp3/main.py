@@ -1,6 +1,5 @@
 from linear import euclid, linear
 from matplotlib import pyplot
-import time
 
 ALPHABET = 'абвгдежзийклмнопрстуфхцчшщыьэюя'
 SAMPLE_SIZE = 10
@@ -72,7 +71,6 @@ def generate_key(bigram1, bigram2):
     return keys
 
 def generate_keys(open_bigrams, cyphered_bigrams):
-    startTime = time.perf_counter()
     pairs = []
     for openBigram in open_bigrams:
         for cypheredBigram in cyphered_bigrams:
