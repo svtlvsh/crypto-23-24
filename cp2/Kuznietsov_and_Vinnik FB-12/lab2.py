@@ -117,7 +117,7 @@ def print_result():
         print(f"Lenkey: {i}")
         find_r(i)
 
-#print_result()
+print_result()
 
 def find_key(r, mova):
     with open("variant_2.txt", 'r', encoding='utf-8') as file:
@@ -200,4 +200,5 @@ def find_key(r, mova):
     a = ''.join(result_array)
     print(a)
 
-#find_key(28, "о")
+find_key(14, "о")
+find_key(28, "о")
