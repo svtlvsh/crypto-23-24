@@ -1,7 +1,7 @@
 from linear import euclid, linear
 from matplotlib import pyplot
 
-ALPHABET = 'абвгдежзийклмнопрстуфхцчшщыьэюя'
+ALPHABET = 'абвгдежзийклмнопрстуфхцчшщьыэюя'
 SAMPLE_SIZE = 10
 BIGRAMS_FREQUENCY_OPEN_TEXT = {'ст': 0.01811,
                                'ни': 0.01727,
