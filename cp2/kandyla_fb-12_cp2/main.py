@@ -8,7 +8,7 @@ def main():
         print(f"{file} ---> {reliability_index(file)}")
     print(f"{filtered} ---> {reliability_index(filtered)}")
     length_and_text = find_key_length(17, "wtf.txt")
-    key = decode_of_key(length_and_text[0], length_and_text[1])
+    key = decode_of_key(length_and_text[0])
     print(key)
     decode_text("возвращениеджинна", "wtf.txt")
     with open("wtf_decrypted.txt", 'r', encoding="utf-8") as file:
@@ -89,19 +89,12 @@ def most_common_char(input_string):
     most_common = max(input_string, key=input_string.count)
     return most_common
 
-def decode_of_key(text, key_length):
+def decode_of_key(text): #видалив параметр key_length 01.11.2023
     key = ""
-    i = 0
-    for part_text in text:
-        if i < 13:
-            y = most_common_char(part_text)
-            x = 'о'
-            key += chr(((ord(y) - ord(x)) % 32) + 1072)
-        else:
-            y = most_common_char(part_text)
-            x = 'о'
-            key += chr(((ord(y) - ord(x)) % 32) + 1072)
-        i += 1
+    for part_text in text: #видалив непотрібний if-else 01.11.2023
+        y = most_common_char(part_text)
+        x = 'о'
+        key += chr(((ord(y) - ord(x)) % 32) + 1072)
     return key
 
 def decode_text(key, encoded_file):
