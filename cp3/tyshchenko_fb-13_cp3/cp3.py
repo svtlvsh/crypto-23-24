@@ -11,10 +11,13 @@ BIGRAMS = ["ст", "но", "то", "на", "ен"]
 
 # Calculate gcd(a, b).
 def euclid(a: int, b: int) -> list:
+    # Make positive.
+    a, b = abs(a), abs(b)
     # Initialize base values.
     u = [1, 0]
     v = [0, 1]
     a0, b0 = a, b
+    # Swap values if necessary.
     if a > b:
         a, b = b, a
         u, v = v, u
@@ -41,10 +44,10 @@ def lin_cmp(a: int, b: int, n: int):
     lst = euclid(n, a)
     # Case gcd(a, n) == 1.
     if lst[0] == 1:
-        return (lst[2] * b) % n
+        return [(lst[2] * b) % n]
     # Case gcd(a, n) = d > 1 and b % d != 0.
     if b % lst[0] != 0:
-        return 0
+        return [0]
     # Case gcd(a, n) = d > 1 and b % d == 0. 
     else:
         a //= lst[0]
@@ -76,8 +79,8 @@ def decode(code) -> str:
         if c < M:
             return ALPHABET[c]
         else:
-            second = c % M
             first = c // M
+            second = c % M
             return f"{ALPHABET[first]}{ALPHABET[second]}"
             
     if isinstance(code, list):
@@ -98,19 +101,17 @@ def find_keys(ct: str) -> list:
     ct_bigrams = list(count_bigrams(ct))
     # Loop through every possible combination of X*, X**, Y*, Y**.
     for i in ct_bigrams[:5]:
-        ct_temp = [x for x in ct_bigrams[:5] if x != i]
-        for j in ct_temp:
+        for j in ct_bigrams[:5]:
             for k in BIGRAMS:
-                temp = [x for x in BIGRAMS if x != k]
-                for l in temp:
-                    a = lin_cmp(encode(k) - encode(l), encode(i) - encode(j), M ** 2)
-                    if isinstance(a, list):
+                for l in BIGRAMS:
+                    if i != j and k != l:
+                        a = lin_cmp(encode(k) - encode(l), encode(i) - encode(j), M ** 2)
                         for n in a:
+                            # Skip found keys.
+                            if n in [k[0] for k in keys]:
+                                continue
                             b = (encode(i) - n * encode(k)) % M ** 2
                             keys.append((n, b))
-                    else:
-                        b = (encode(i) - a * encode(k)) % M ** 2
-                        keys.append((a, b))
     return keys
 
 # Check if deciphered PT is sensible.
@@ -122,7 +123,7 @@ def sensible(pt: str) -> int:
     	if l in FREQ_L:
             score += 1
     # Check the least frequent letters.
-    for l in letters[:3]:
+    for l in letters[-3:]:
     	if l in RARE_L:
             score += 1
     # Check the most frequent bigrams.
@@ -132,31 +133,58 @@ def sensible(pt: str) -> int:
             score += 1
     return score 
 
-# TESTS
-# Find inverse.
-print(euclid(155, 29))
-# Solve linear comparison (case 1).
-print(lin_cmp(7, 19, 41))
-# Solve linear comparison (case 3).
-print(lin_cmp(39, 30, 111))
-# Count bigrams of "hello world!" without and with overlap.
-print(count_bigrams("hello world! hello mum"))
-print(count_bigrams("hello world! hello mum", overlap=True))
-# Encode and decode bigram.
-print(f"{decode(63)} ({encode('вб')})")
-# Check sensibility of text.
-data = open('custom.txt', 'r').read().strip()
-print(f"sensible: score = {sensible(data)}")
-data = open('var3.txt', 'r').read().strip()
-print(f"nonsensible: score = {sensible(data)}")
-# Find canditates for keys.
-candidates = find_keys(data)
-keys = []
-for k in candidates:
-    if sensible(decrypt(data, k)) > 4:
-        keys.append(k)
-# Remove duplicates.
-keys = list(dict.fromkeys(keys))
-print(keys)
-for k in keys:
-    print(f"key = {k}\n{decrypt(data, k)}\n\n")
+def tests(f1: str, f2: str):
+    # Find inverse.
+    print(euclid(155, 29))
+    print(euclid(2, -5))
+    print(euclid(-15, 40))
+    # Solve linear comparison (case 1).
+    print(lin_cmp(7, 19, 41))
+    # Solve linear comparison (case 3).
+    print(lin_cmp(39, 30, 111))
+    # Count bigrams of "hello world!" without and with overlap.
+    print(count_bigrams("hello world! hello mum"))
+    print(count_bigrams("hello world! hello mum", overlap=True))
+    # Encode and decode bigram.
+    print(f"{decode(63)} ({encode('вб')})")
+    # Check sensibility of text.
+    data = open(f1, 'r').read().strip()
+    print(f"sensible: score = {sensible(data)}")
+    data = open(f2, 'r').read().strip()
+    print(f"nonsensible: score = {sensible(data)}")
+    # Find canditates for keys.
+    candidates = find_keys(data)
+    keys = []
+    for k in candidates:
+        if sensible(decrypt(data, k)) > 4:
+            keys.append(k)
+    print(keys)
+    for k in keys:
+        print(f"key = {k}\n{decrypt(data, k)}\n\n")
+        
+def solve(f: str) -> None:
+    # Read input file.
+    data = open(f, 'r').read().strip()
+    # Show 5 most common bigrams of CT.
+    ct_bigrams = list(count_bigrams(data))[:5]
+    print(f"The most common bigrams of CT:\n\t{ct_bigrams}")
+    # Find canditates for keys.
+    candidates = find_keys(data)
+    keys = []
+    for k in candidates:
+        pt = decrypt(data, k)
+        if sensible(pt) > 5:
+            keys.append(k)
+    # Show found keys.
+    print(f"Found keys (a, b):\n\t{keys}")
+    for k in keys:
+        print(f"Decrypted with key {k}:\n{decrypt(data, k)}\n\n")
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print(f"""USAGE: {sys.argv[0]} VAR3FILE
+[*] VAR3FILE\t- path to var3 text file.""")
+    else:
+        f = sys.argv[1]
+        solve(f)
+
