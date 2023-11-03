@@ -47,7 +47,7 @@ def lin_cmp(a: int, b: int, n: int):
         return [(lst[2] * b) % n]
     # Case gcd(a, n) = d > 1 and b % d != 0.
     if b % lst[0] != 0:
-        return [0]
+        return [-1]
     # Case gcd(a, n) = d > 1 and b % d == 0. 
     else:
         a //= lst[0]
@@ -107,17 +107,18 @@ def find_keys(ct: str) -> list:
                     if i != j and k != l:
                         a = lin_cmp(encode(k) - encode(l), encode(i) - encode(j), M ** 2)
                         for n in a:
-                            # Skip found keys.
-                            if n in [k[0] for k in keys]:
+                            # Skip found keys and equations without solutions.
+                            if n in [k[0] for k in keys] or n == -1:
                                 continue
                             b = (encode(i) - n * encode(k)) % M ** 2
                             keys.append((n, b))
     return keys
 
-# Check if deciphered PT is sensible.
-def sensible(pt: str) -> int:
+# Check if text is sensible.
+def sensible(text: str) -> int:
     score = 0
-    letters = list(dict(sorted(Counter(pt).items(), reverse=True, key=lambda item: item[1])))
+    # Count letters of text and store them by values in descending order.
+    letters = list(dict(sorted(Counter(text).items(), reverse=True, key=lambda item: item[1])))
     # Check the most frequent letters.
     for l in letters[:3]:
     	if l in FREQ_L:
@@ -127,7 +128,7 @@ def sensible(pt: str) -> int:
     	if l in RARE_L:
             score += 1
     # Check the most frequent bigrams.
-    bigrams = list(count_bigrams(pt, overlap=True))[:5]
+    bigrams = list(count_bigrams(text, overlap=True))[:5]
     for b in range(5):
         if bigrams[b] in BIGRAMS:
             score += 1
