@@ -141,7 +141,9 @@ def decrypter(text: str, delta: float, r_max: int) -> str:
 
         if abs(avg_ind/r - ind_theor) < delta:
             blocks.update({r: coinc_per_block})
-            print(f"{avg_ind/r:<22}|{r:^10}")
+            # print(f"{avg_ind/r:<22}|{r:^10}")
+        
+        print(f"{r},{avg_ind/r}")
 
     key_len = list(blocks.keys())[0]
 
