@@ -162,7 +162,3 @@ print(len(decrypted_text))
 
 
 
-# def write_text_to_file(file_path, text, mode='w'):
-#     with open(file_path, mode) as file:
-#         file.write(text)
-# write_text_to_file(file, text.replace("\n",''))
