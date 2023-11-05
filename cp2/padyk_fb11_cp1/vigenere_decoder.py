@@ -6,7 +6,7 @@ alphabet = "абвгдежзийклмнопрстуфхцчшщъыьэюя"
 alphabet_len = len(alphabet)
 alphabet_set = {alphabet[i]:i for i in range(alphabet_len)}
 print(alphabet_set)
-file = "text.txt"
+file = "encoded_v14.txt"
 
 print("Alphabet: ", alphabet, "\nLength: ", alphabet_len)
 
