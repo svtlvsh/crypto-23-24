@@ -16,7 +16,7 @@ key20 = "щовибачитепередсобою"
 
 
 def write_text_to_file(file_path, text, mode='w'):
-    with open(file_path, mode) as file:
+    with open(file_path, mode, encoding='utf-8') as file:
         file.write(text)
 
 
@@ -39,7 +39,7 @@ def print_diagram(data):
 def read_text_from_file(file_path):
     with open(file_path, 'r',encoding='utf-8') as file:
         text = file.read()
-    return text.strip()
+    return text
 
 def viginere_encoder(text,key):
     text_len=len(text)
@@ -80,6 +80,8 @@ encoded[4] = viginere_encoder(text,key4)
 encoded[5] = viginere_encoder(text,key5)
 encoded[10] = viginere_encoder(text,key10)
 encoded[20] = viginere_encoder(text,key20)
+
+
 
 compliance_indexes = {}
 for i in encoded:
