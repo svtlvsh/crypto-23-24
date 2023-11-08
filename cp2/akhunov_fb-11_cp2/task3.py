@@ -20,16 +20,25 @@ def key_generate(key_len: int) -> str:
 
 
 # Ця функція розшифровує текст
-def decryption(text: str, key: str) -> str:
-    global ALPHABET
-    key_index: int = 0
-    decrypted_text: str = ''
-    for char in text:
-        decrypted_char_index = (ALPHABET.index(char) - ALPHABET.index(key[key_index])) % len(ALPHABET)
-        decrypted_char = ALPHABET[decrypted_char_index]
-        decrypted_text += decrypted_char
-        key_index = (key_index + 1) % len(key)
-    return decrypted_text
+# def decryption(text: str, key: str) -> str:
+#     global ALPHABET
+#     key_index: int = 0
+#     decrypted_text: str = ''
+#     for char in text:
+#         decrypted_char_index = (ALPHABET.index(char) - ALPHABET.index(key[key_index])) % len(ALPHABET)
+#         decrypted_char = ALPHABET[decrypted_char_index]
+#         decrypted_text += decrypted_char
+#         key_index = (key_index + 1) % len(key)
+#     return decrypted_text
+
+
+# Ця функція розбиває текст на блоки
+def create_blocks(encrypted_text: str, key_len: int) -> list:
+    blocks: list = []
+    for i in range(key_len):
+        block = encrypted_text[i::key_len]
+        blocks.append(block)
+    return blocks
 
 
 # Ця функція рахує індекси відповідності
@@ -40,10 +49,9 @@ def affinity_index(encrypted_text: str) -> float:
         if char in frequency:
             frequency[char] += 1
         else:
-            frequency[char] = 0
+            frequency[char] = 1
     for char in frequency:
-        affinity += (frequency[char] * (frequency[char] - 1)) / \
-                    (len(encrypted_text) * len(encrypted_text) - 1)
+        affinity += (frequency[char] * (frequency[char] - 1)) / (len(encrypted_text) * (len(encrypted_text) - 1))
     return affinity
 
 
@@ -64,8 +72,11 @@ def main():
     affinity_dict: dict = {}
     for i in range(2, 51):
         key = key_generate(i)
-        decrypted_text = decryption(text,key)
-        affinity_dict[key] = affinity_index(decrypted_text)
+        text_blocks = create_blocks(text, len(key))
+        affinity: int = 0
+        for block in text_blocks:
+            affinity += affinity_index(str(block))
+        affinity_dict[key] = affinity / len(key)
     create_csv_file('Affinities_task3.csv', affinity_dict)
 
 

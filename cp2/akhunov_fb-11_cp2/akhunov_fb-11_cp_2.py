@@ -4,7 +4,7 @@ import csv
 KEYS: tuple = ('да', 'дуб', 'хлеб', 'туман', 'облачность', 'завтрапятницакайфуем')
 
 # Алфавіт
-ALPHABET: str = 'абвгдежзийклмнопрстуфхцчшщыьэюя'
+ALPHABET: str = 'абвгдежзийклмнопрстуфхцчшщъыьэюя'
 
 
 # Ця функція зчитує текстовий файл та поверає string з текстом цього файлу
@@ -47,7 +47,7 @@ def affinity_index(encrypted_text: str) -> float:
             frequency[char] = 1
     for char in frequency:
         affinity += (frequency[char] * (frequency[char] - 1)) / \
-                    (len(encrypted_text) * len(encrypted_text) - 1)
+                    (len(encrypted_text) * (len(encrypted_text) - 1))
     return affinity
 
 
@@ -73,6 +73,7 @@ def main():
     affinity_dict['Вхідний текст'] = affinity_index(text)
     for key in KEYS:
         encrypted_text = encryption(key, text)
+        print(encrypted_text)
         affinity_dict[key] = affinity_index(encrypted_text)
     create_csv_file('Affinities.csv', affinity_dict)
 
