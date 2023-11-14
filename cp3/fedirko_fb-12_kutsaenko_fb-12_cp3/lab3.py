@@ -115,3 +115,80 @@ def find_keys(text, most_popular_bigrams):
     #print(f"\nВаріанти можливого 'b': {array_b}")
     #print('a',len(array_a),'b',len(array_b))
     return array_a, array_b
+
+def decrypt_bigrams(a, b, array):
+
+    array_decrypted = []
+
+    for number in array:
+        res_gcd, x, y = GCD(a, 31 ** 2)
+        #a = mod_inv(a, 31)
+        new_number = (x * (number - b)) % (31**2)
+        array_decrypted.append(new_number)
+
+    return array_decrypted
+
+def check(result_bigrams, a, b):
+    exclude_list = ['аь', 'еь', 'иь', 'оь', 'уь', 'ыь', 'ьь', 'эь', 'юь', 'яь', 'аы', 'еы', 'иы', 'оы', 'уы', 'ыы', 'ьы', 'эы', 'юы', 'яы']
+
+    if all(item not in result_bigrams for item in exclude_list):
+
+        text = ''.join(result_bigrams)
+        print("Розшифрований текст: ", text)
+        print("'a': ", a)
+        print("'a': ", b)
+result = []
+
+def remove_duplicates(arr1, arr2):
+    seen = set()
+    unique_arr1 = []
+    unique_arr2 = []
+
+    for i, item in enumerate(arr1):
+        if item not in seen:
+            seen.add(item)
+            unique_arr1.append(item)
+            unique_arr2.append(arr2[i])
+
+    return unique_arr1, unique_arr2
+
+def decrypt_text(array_a, array_b, array):
+    for i in range(len(array_a)):
+        a = array_a[i]
+        b = array_b[i]
+        if a != 0:
+            decrypted_array = decrypt_bigrams(a,b, array)
+            result_bigrams = numbers_to_bigrams(decrypted_array)
+            check(result_bigrams, a, b)
+
+
+file_path = 'H:\\криптографія лаби\\labs\\crypto-23-24\\cp3\\text.txt'
+
+text = read_text_from_file(file_path)
+
+#print(GCD(18, 961))
+#res_gcd, x, y = GCD(18, 961)
+#print(x)
+array = bigram_frequencies(text)
+array = bigrams_to_numbers(array)
+#print(array)
+
+big = find_most_frequent_bigrams(text, 5)
+#print(big)
+
+# Приклад використання
+bigram = big[0]
+#print(bigram)
+result = bichar_to_number(bigram)
+#print(result) 
+# Приклад використання
+
+result_numbers = bigrams_to_numbers(big)
+#print(result_numbers)
+find_keys(text, most_popular_bigrams)
+
+#print(numbers_to_bigrams(result_numbers))
+array_a, array_b = find_keys(text, most_popular_bigrams)
+array_a, array_b = remove_duplicates(array_a, array_b)
+
+print(decrypt_text(array_a, array_b, array))
