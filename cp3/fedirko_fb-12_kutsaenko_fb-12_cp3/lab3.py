@@ -80,3 +80,38 @@ def number_to_bichar(number):
 def numbers_to_bigrams(numbers):
     result = ''.join([''.join(number_to_bichar(number)) for number in numbers])
     return result
+
+def find_keys(text, most_popular_bigrams):
+
+    # Біграми X та Y
+    X = bigrams_to_numbers(most_popular_bigrams)
+    Y = find_most_frequent_bigrams(text, 5)
+    Y = bigrams_to_numbers(Y)
+    #print(X, Y)
+
+    array_a = []
+    array_b = []
+
+    for x1 in X:
+        for y1 in Y:
+            for x2 in X:
+                for y2 in Y:
+                    res_gcd, x, y = GCD(x1 - x2, 31**2)
+                    if res_gcd == 1:
+                        a = ((y1 - y2) * x) % (31**2) #mod_inv(x1 - x2, 31**2))
+                        array_a.append(a)
+                        b = (y1 - a * x1) % (31**2)
+                        array_b.append(b)
+                    elif res_gcd > 1:
+                        if x1 - x2 != 0:
+                            solutions = solve_linear_congruence(x1 - x2, y1 - y2, 31**2)
+                            for solution in solutions:
+                                a = solution
+                                b = (y1 - a * x1) % (31**2)
+                                array_a.append(a)
+                                array_b.append(b)
+
+    #print(f"Варіанти можливого 'a': {array_a}")
+    #print(f"\nВаріанти можливого 'b': {array_b}")
+    #print('a',len(array_a),'b',len(array_b))
+    return array_a, array_b
