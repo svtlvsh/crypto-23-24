@@ -1,67 +1,46 @@
 import text_manipulator as tm
-from collections import defaultdict, Counter
+from collections import Counter
 
 
-alphabet = 'абвгдежзийклмнопрстуфхцчшщъыьэюя'  # 32
-al_len = 32
-first_char = ord('а')  # 1072
+# Getting open text
 text = tm.get_text("valid_text_without_spaces.txt")
+# Keys for encrypting
 keys = ['да', 'нет', 'соль', 'сахар', 'синиймакар', 'светлоитеплосеогодня']
 
 
-alphabet_dict = defaultdict()
-for l in alphabet:
-    alphabet_dict[l] = ord(l) - 1071
+# Function for encrypting text using vigenere method
+def vig_encrypt(key, text_ex):
+    # Using list comprehension, ord() func and encrypting formula we are getting encrypted text
+    encrypted_text = [
+        chr((ord(text[i]) + ord(key[i % len(key)])) % 32 + ord('а'))
+        for i in range(len(text_ex))
+    ]
+    return ''.join(encrypted_text)
 
 
-def key_to_nums(key):
-    num_key = [alphabet_dict[x] for x in list(key)]
-    return num_key
-
-
-def vig_encrypt(key, text):
-    encrypted_text = ''
-    key_len = len(key)
-    for i in range(len(text)):
-        l = text[i]
-        k = key[i % key_len]
-        encrypted_text += chr((ord(l) - 1072 + k) % 32 + 1072)
-
-    return encrypted_text
-
-
+# Function for counting compliance index for some text
 def index(text_ex):
     first_part = 1 / (len(text_ex) * (len(text_ex) - 1))
-    second_part = [text.count(l)*(text.count(l)-1) for l in alphabet]
+    second_part = [n * (n - 1) for n in Counter(text_ex).values()]
     second_part = sum(second_part)
     return first_part * second_part
 
 
+# Function for making blocks of text
 def separator(text_ex, key_len):
-    groups = [[] for _ in range(key_len)]
+    groups = [text_ex[i::key_len] for i in range(key_len)]
 
-    for i in range(0, len(text_ex), key_len):
-        for k in range(key_len):
-            try:
-                groups[k].append(text_ex[i+k])
-            except IndexError:
-                continue
-
-    unic_groups = [{i for i in g} for g in groups]
-
-    return groups, unic_groups
+    return groups
 
 
-def indexes(separated):
-    groups, unic_groups = separated
-    # print(groups, unic_groups)
+# Function for counting comp. index for specific length of key
+def indexes(groups):
     all_indexes = []
+
     for i in range(len(groups)):
         first_part = 1 / (len(groups[i]) * (len(groups[i]) - 1))
-        second_part = [groups[i].count(x)*(groups[i].count(x)-1) for x in unic_groups[i]]
-        # print(second_part)
+        second_part = [n * (n - 1) for n in Counter(groups[i]).values()]
         second_part = sum(second_part)
-        # print(first_part, second_part)
         all_indexes.append(first_part * second_part)
 
     mean_index = sum(all_indexes) / len(all_indexes)
@@ -69,111 +48,88 @@ def indexes(separated):
     return mean_index
 
 
+# Function for see if values approximately equal
 def approx_equal(x, y, epsilon=0.001):
     return abs(x - y) < epsilon
 
 
-# testing
-# encrypted = vig_encrypt(key_to_nums('да'), 'привет')
+# Encryption testing
+# encrypted = vig_encrypt('да', 'привет')
 # print(encrypted)
-# print(vig_encrypt([-5, -1], encrypted))
 
-########
-# 1, 2
+#############################
+# 1, 2 tasks
 
-# print('Open text:')
-# print(text)
-# # print()
-# print(f"Index: {index(text)}")
-# print()
-#
-# for k in keys:
-#     print(f"Encrypted text with key '{k}':")
-#     enc = vig_encrypt(key_to_nums(k), text)
-#     print(enc)
-#     # print()
-#     print(f"Index: {index(enc)}")
-#     print()
+print('Open text:')
+print(text)
+print(f"Index: {index(text)}")
+print()
 
-########
+for k in keys:
+    print(f"Encrypted text with key '{k}' (length of key is {len(k)}):")
+    enc = vig_encrypt(k, text)
+    print(enc)
+    print(f"Index: {index(enc)}")
+    print()
 
 
-# print(tm.get_frequency("letters_frequency_without_spaces.csv"))
+#############################
+# 3 task
 
-freqs_sqs = [float(i)**2 for i in tm.get_frequency("letters_frequency_without_spaces.csv").values()]
-MI = sum(freqs_sqs)  # 0.05593598260963655
+# Getting encrypted text
+enc_text = tm.get_text("encrypted_var1.txt")
+
+
+# Getting value of I for open text
+# freqs_sqs = [float(i)**2 for i in tm.get_frequency("letters_frequency_without_spaces.csv").values()]
+# MI = sum(freqs_sqs)  # 0.05593598260963655
 # print(MI)
 
-
-########
-# 3
-
-encrypted_text = tm.get_text("encrypted_var1.txt")
-# print(encrypted_text)
-
-I = 0
+# Getting most possible length of key using value of I and comparing these values
+Ind = 0
 r = 1
-
-# for i in range(2, 100):
-#     print(indexes(separator(encrypted_text, i)))
-
-while not approx_equal(0.0553, I):
+while not approx_equal(0.0553, Ind):
     r += 1
-    I = indexes(separator(encrypted_text, r))
+    Ind = indexes(separator(enc_text, r))
 
+# We got length of r. It's 12
 print("r =", r)
 
-groups = separator(encrypted_text, r)[0]
-most_fr_letter = [l for l in tm.get_frequency("letters_frequency_without_spaces.csv").keys()]
 
-# print(Counter(groups[0]))
+# Making groups of letters to get most frequent ones later
+enc_groups = separator(enc_text, r)
 
-# fin_key1 = ''
-# fin_key2 = ''
-# fin_key3 = ''
+# Using table from previous lab getting list of most frequent letters in ruzzian language
+most_fr_letter = [letter for letter in tm.get_frequency("letters_frequency_without_spaces.csv").keys()]
 
-def get_fin_keys(n):
+
+# Function for getting most possible key using groups of letters
+def get_fin_keys(groups):
     fin_key = ''
     for i in groups:
         counter = Counter(i)
-        # print(counter)
         most_fr_letter_in_group = counter.most_common(1)[0][0]
-        pos = ord(most_fr_letter_in_group) - ord(most_fr_letter[n])
-        # print(most_fr_letter_in_group, most_fr_letter[n])
-        # print(pos)
-        if pos >= 0:
-            fin_key += chr(pos + 1072)
-        else:
-            fin_key += chr(1103 + pos)
+        pos = (ord(most_fr_letter_in_group) - ord(most_fr_letter[0])) % 32
+        fin_key += chr(pos + 1072)
 
     return fin_key
 
 
-print(get_fin_keys(0))
-# print(get_fin_keys(1))
-# print(get_fin_keys(2))
+# Function for decrypting encrypted text
+def vig_decrypt(key, text):
+    # Using list comprehension, ord() func and decrypting formula we are getting decrypted text
+    decrypted_text = [
+        chr((ord(text[i]) - (ord(key[i % len(key)]))) % 32 + ord('а'))
+        for i in range(len(text))
+    ]
+    return ''.join(decrypted_text)
 
 
+# Getting key
+print(get_fin_keys(enc_groups))
 
-# for i in groups:
-#     counter = Counter(i)
-#     print(counter)
-#     most_fr_letter_in_group = counter.most_common(1)[0][0]
-#     pos = ord(most_fr_letter_in_group) - ord(most_fr_letter[n])
-#     print(most_fr_letter_in_group, most_fr_letter[n])
-#     print(pos)
-#     if pos >= 0:
-#         fin_key += chr(pos + 1072)
-#     else:
-#         fin_key += chr(1103 + pos)
+# We got key "вшекспирбуря", and it stands for "В. Шекспир - Буря"
+# So key is "вшекспирбуря"
 
-# print(fin_key)
-# print(ord('ї'))
-
-
-print(vig_encrypt([-x for x in key_to_nums('вчебспирбтрю')], encrypted_text))
-
-
-
-
-
+# Text decrypting
+print(vig_decrypt('вшекспирбуря', enc_text))
