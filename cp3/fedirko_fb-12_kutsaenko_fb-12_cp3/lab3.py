@@ -26,3 +26,57 @@ def solve_linear_congruence(a, b, m):
         return solutions
     else:
         return []
+
+def read_text_from_file(file_path):
+    with open(file_path, 'r', encoding='UTF-8') as file:
+        text = file.read()
+    return text
+
+def bigram_frequencies(text):
+    bigrams = [text[i:i+2] for i in range(0, len(text) - 1, 2)]
+    return bigrams
+
+def calculate_bigram_frequencies(text):
+    bigrams = [text[i:i+2] for i in range(0, len(text) - 1, 2)]
+    return Counter(bigrams)
+
+
+def find_most_frequent_bigrams(text, n):
+    frequencies = calculate_bigram_frequencies(text)
+    most_common_bigrams = frequencies.most_common(n)
+    result = [[bigram[0][0], bigram[0][1]] for bigram in most_common_bigrams]
+    return result
+
+def bichar_to_number(bigram):
+    alphabet = "абвгдежзийклмнопрстуфхцчшщьыэюя"
+    
+    x, y = bigram
+    num_x = alphabet.index(x)
+    num_y = alphabet.index(y)
+    #print(num_x, num_y)
+    
+    m = len(alphabet)
+    #print(m)
+    result = num_x * m + num_y
+    
+    return result
+
+def bigrams_to_numbers(bigrams):
+    result = [bichar_to_number(bigram) for bigram in bigrams]
+    return result
+
+def number_to_bichar(number):
+    alphabet = "абвгдежзийклмнопрстуфхцчшщьыэюя"
+    m = len(alphabet)
+    
+    num_x = number // m
+    num_y = number % m
+    
+    char_x = alphabet[num_x]
+    char_y = alphabet[num_y]
+    
+    return char_x + char_y
+
+def numbers_to_bigrams(numbers):
+    result = ''.join([''.join(number_to_bichar(number)) for number in numbers])
+    return result
