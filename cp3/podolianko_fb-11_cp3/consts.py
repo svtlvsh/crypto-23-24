@@ -1,4 +1,4 @@
-ALPHABET = 'абвгдежзийклмнопрстуфхцчшщыьэюя'  # mind that data from lab1 counts ё
+ALPHABET = 'абвгдежзийклмнопрстуфхцчшщьыэюя'  # mind that data from lab1 counts ё
 assert len(ALPHABET) == 31
 
 

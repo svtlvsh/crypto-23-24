@@ -46,6 +46,16 @@ def from_indexes(i_list: List[int], alpha: str) -> str:
     return ''.join(alpha[i] for i in i_list)
 
 
+def to_index(letter: str, alpha: str) -> List[int]:
+    if len(letter) != 1:
+        raise ValueError("Expected one letter")
+    return alpha.find(letter)
+
+
+def from_index(i: int, alpha: str) -> str:
+    return alpha[i]
+
+
 def letter_freq(text: str) -> List[Tuple[str, float]]:
     return [(letter, text.count(letter) / len(text)) for letter in set(text)]
 
@@ -55,16 +65,14 @@ def md_table_rows(rows) -> str:
 
 
 def md_table_columns(columns: Tuple[List, List], formats: List[str] | Tuple = '%s') -> str:
-    columns = [[format(columns[i][row], formats[i]) for row in range(len(columns[i]))] for i in range(len(columns))]
+    columns = [[format(columns[i][row], formats[i]) for row in range(
+        len(columns[i]))] for i in range(len(columns))]
 
     return '\n'.join(['|' + '|'.join(row) + '|' for row in zip(*columns)])
 
 
 def extended_euclid(a: int, b: int) -> Tuple[int, int, int]:
     """returns gcd, u, v"""
-    # if a > b or b < 0:
-    #     raise ValueError("a < b or a < 0")
-
     q = list()
     r = [a, b]
 
@@ -89,35 +97,96 @@ def extended_euclid(a: int, b: int) -> Tuple[int, int, int]:
     return gcd, u[-1], v[-1]
 
 
-def mul_inverse(a, m):
-    # TODO reimpl using euclid
-    x = m
-    y = a % m
-
-    if y == 0:
-        raise ValueError("m|a; gcd(a,m) == m != 1")
-
-    q = list()
-    r = list((0, 1))
-
-    while x % y != 0:
-        q.append(x // y)
-        x, y = y, x % y
+def mul_inverse(a, m) -> int | None:
+    """returns multiplicative inverse of a modulo m, or None if it doesn't exist"""
+    gcd, u, _ = extended_euclid(a, m)
+    if abs(gcd) != 1:
+        return None
     else:
-        # we get to gcd here
-        if y != 1:
-            raise ValueError("gcd(a,m) != 1")
-
-    for qi in q:
-        r.append(r[1] * (-qi) + r[0])
-        r.pop(0)
-
-    return r.pop() % m
+        return u
 
 
-def solve_congruence(a, b, m):
+def gcd(a, b):
+    """returns (positive) gcd of a, b"""
+    return abs(extended_euclid(a, b)[0])
+
+
+def solve_congruence(a: int, b: int, m: int) -> List[int]:
     """solves ax == b mod m and returns a list of solutions (if any)"""
-    raise NotImplementedError
+    gcd_am, a_inv, _ = extended_euclid(a, m)
+    if a_inv is None:
+        return []
+
+    if b % gcd_am != 0:
+        return []
+
+    s = []
+    for r in range(1, gcd_am+1):
+        s.append((b*a_inv % m)*r)
+
+    return s
+
+
+def import_freq_from(file: str) -> Dict[str, float]:
+    import json
+    with open(file, 'rt') as f:
+        return json.load(f)
+
+
+def sort_fqs(fmap: Dict[str, float]) -> List[str]:
+    return list(
+        map(lambda x: x[0],
+            sorted(
+                fmap.items(),
+                key=lambda x:
+                x[1],
+                reverse=True
+        )))
+
+
+def sort_fqs_val(fmap: Dict[str, float]) -> List[Tuple[str, float]]:
+    return sorted(
+        fmap.items(),
+        key=lambda x:
+        x[1],
+        reverse=True
+    )
+
+
+def bg_to_num(bg: str) -> int:
+    return to_index(bg[0], ALPHABET) * len(ALPHABET) + to_index(bg[1], ALPHABET)
+
+
+def num_to_bg(num: int) -> str:
+    return from_index((num - (num % len(ALPHABET))) // len(ALPHABET), ALPHABET) + from_index(num % len(ALPHABET), ALPHABET)
+
+
+def encrypt(msg: str, key: Tuple[int, int]):
+    a, b = key
+    m = len(ALPHABET)**2
+
+    dec = list()
+    for i in range(0, len(msg) // 2, 2):
+        dec.append(
+            num_to_bg(
+                (bg_to_num(msg[i:i+2]) * a + b) % m
+            )
+        )
+
+
+def decrypt(cypher: str, key: Tuple[int, int]) -> str:
+    a, b = key
+    m = len(ALPHABET)**2
+
+    dec = list()
+    for i in range(0, len(cypher) // 2, 2):
+        dec.append(
+            num_to_bg(
+                ((bg_to_num(cypher[i:i+2]) - b) * mul_inverse(a, m)) % m
+            )
+        )
+
+    return ''.join(dec)
 
 
 if __name__ == '__main__':
