@@ -1,16 +1,6 @@
-from utils import *
-from typing import List, Dict, Set
 import consts
 from itertools import product, combinations, permutations
 from cleartext_criteria import *
-
-FREQ_SAMPLE = './data/bg_wh_False_olp_False.json'
-CLEARTEXT_SAMPLE = '../../cp1/podolianko_fb-11_cp1/data/sample.txt'
-CT_SAMPLE = './data/V13'
-CT_TASK = './data/13.txt'
-
-TOP = 11  # might want to adjust this
-
 
 def main(args):
     cyphertext_file = args.file
@@ -73,8 +63,8 @@ def main(args):
     for key in key_candidates:
         dec = decrypt(ct_norm, key=key)
         letter_freq = ngram_frequencies(dec, 1, False)
-        if not check_entropy(dec, letter_freq)\
-                or not check_letter_min_freq(dec, letter_freq, mg_freq):
+        if not check_entropy(dec, letter_freq, args.e)\
+                or not check_letter_min_freq(dec, letter_freq, mg_freq, args.n, args.q):
             false_keys.add(key)
             continue
 
@@ -107,5 +97,8 @@ if __name__ == "__main__":
                         help="how many most frequent bigrams should be checked")
     parser.add_argument("--use-known-bigrams", action='store_true', dest='ukb',
                         help="whether to use known top 5 most frequent bigrams (will be included in total --top count, before the ones sampled from clearfile)")
+    parser.add_argument("-q", default=0.7, type=float, help="min freq multiplier")
+    parser.add_argument("-n", default=5, type=int, help="min letters to check")
+    parser.add_argument("-e", default=4.9, type=float, help="max cleartext entropy")
     args = parser.parse_args()
     main(args)
