@@ -66,7 +66,7 @@ def main(args):
 
     print("Total candidates:", len(key_candidates))
 
-    print("Trying to reduce the number by running a few test...")
+    print("Trying to reduce the number by running a few tests...")
     # now we try to reduce the number of possibly valid keys
     decs = []
     false_keys = set()
@@ -86,8 +86,13 @@ def main(args):
 
     if len(key_candidates) < 11:
         for key in key_candidates:
+            dec = decrypt(ct_norm, key)
+            letter_freq = ngram_frequencies(dec, 1, False)
+            e = entropy_from_probabilities(letter_freq.values())
             print(f"Key: {key}")
-            print(decrypt(ct_norm, key), "\n\n")
+            print(dec, "\n\n")
+            print(f"Actual entropy per character: {e}")
+            print(f"Actual top letter frequencies: {list(map(lambda x: (x[0], '%.3f%%' %( 100*x[1])), sort_fqs_val(letter_freq)[:10]))}")
     else:
         print("Stil more than 10 keys remaining... Not good.")
 
@@ -101,6 +106,6 @@ if __name__ == "__main__":
     parser.add_argument("--top", type=int, default=5, dest="top",
                         help="how many most frequent bigrams should be checked")
     parser.add_argument("--use-known-bigrams", action='store_true', dest='ukb',
-                        help="whether to use known top 5 most frequent bigrams (will be included in totl --top count, before the ones sampled from clearfile)")
+                        help="whether to use known top 5 most frequent bigrams (will be included in total --top count, before the ones sampled from clearfile)")
     args = parser.parse_args()
     main(args)
