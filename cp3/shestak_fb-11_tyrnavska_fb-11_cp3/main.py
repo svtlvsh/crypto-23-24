@@ -54,7 +54,7 @@ def solve_linear_congruence(a, b, m):
 # 2 пункт
 
 # Використовуючи функції з минулої лабораторної отримуємо 5 найчастіших біграм
-flc.bigrams_frequency('01.txt', 'bigrams_frequency.csv', 1)
+flc.bigrams_frequency('01.txt', 'bigrams_frequency.csv', 2)
 fr_bigrams = list(flc.get_frequency('bigrams_frequency.csv').keys())
 
 
