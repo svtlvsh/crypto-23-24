@@ -116,11 +116,11 @@ def get_fin_keys(groups):
 
 
 # Function for decrypting encrypted text
-def vig_decrypt(key, text):
+def vig_decrypt(key, text_ex):
     # Using list comprehension, ord() func and decrypting formula we are getting decrypted text
     decrypted_text = [
-        chr((ord(text[i]) - (ord(key[i % len(key)]))) % 32 + ord('а'))
-        for i in range(len(text))
+        chr((ord(text_ex[i]) - (ord(key[i % len(key)]))) % 32 + ord('а'))
+        for i in range(len(text_ex))
     ]
     return ''.join(decrypted_text)
 
@@ -128,7 +128,7 @@ def vig_decrypt(key, text):
 # Getting key
 print(get_fin_keys(enc_groups))
 
-# We got key "вшекспирбуря", and it stands for "В. Шекспир - Буря"
+# We got key "вшебспирбуря", and it stands for "В. Шекспир - Буря"
 # So key is "вшекспирбуря"
 
 # Text decrypting
