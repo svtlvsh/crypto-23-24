@@ -112,15 +112,15 @@ def output_table(frequency: dict) -> str:
     return text
 
 
-def calculate_entropy(frequencies: dict) -> float:
+def calculate_entropy(frequencies: dict, length: int) -> float:
     entropy = 0.0
     for frequency in frequencies.values():
         entropy -= frequency*log2(frequency)
-    return entropy
+    return entropy/length
 
 
-def calculate_redundancy(entropy: float, alphabet_power: int) -> float:
-    h0 = log2(alphabet_power)
+def calculate_redundancy(entropy: float, alphabet_power: int, length: int) -> float:
+    h0 = log2(alphabet_power)/length
     return 1-entropy/h0
 
 
@@ -141,16 +141,17 @@ if __name__ == "__main__":
         text += output_table(frequencies)
 
     for frequencies in all_frequencies:
-        entropy = round(calculate_entropy(frequencies), 5)
-        redundancy = round(calculate_redundancy(entropy, len(frequencies)), 5)
+        length = 1 if frequencies in [letters, letters_no_spaces] else 2
+        entropy = round(calculate_entropy(frequencies, length), 5)
+        redundancy = round(calculate_redundancy(entropy, len(frequencies), length), 5)
         text += f"{entropy} {redundancy}\n"
         print(entropy, redundancy)
     save_text("data.csv", text)
 
     print("Redundancies from CoolPinkProgram")
-    print(round(calculate_redundancy(2.44563, 32), 5))
-    print(round(calculate_redundancy(3.17705, 32), 5))
-    print(round(calculate_redundancy(1.38487, 32), 5))
-    print(round(calculate_redundancy(2.05225, 32), 5))
-    print(round(calculate_redundancy(1.29114, 32), 5))
-    print(round(calculate_redundancy(2.04913, 32), 5))
+    print(round(calculate_redundancy(2.44563, 32, 1), 5))
+    print(round(calculate_redundancy(3.17705, 32, 1), 5))
+    print(round(calculate_redundancy(1.38487, 32, 1), 5))
+    print(round(calculate_redundancy(2.05225, 32, 1), 5))
+    print(round(calculate_redundancy(1.29114, 32, 1), 5))
+    print(round(calculate_redundancy(2.04913, 32, 1), 5))
